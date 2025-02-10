@@ -1,6 +1,6 @@
 import yaml
 import jsonschema
-from jsonschema import validate
+from jsonschema import validate, ValidationError
 from schema import UPSUN_SCHEMA
 
 def validate_upsun_config(yaml_string):
@@ -13,11 +13,18 @@ def validate_upsun_config(yaml_string):
     except yaml.YAMLError as e:
         return [f"YAML parsing error: {e}"]
     
+    # Handle None or empty config
+    if config is None:
+        return ["YAML parsing error: Empty configuration"]
+    
     try:
+        # Strict validation with all keyword checks
         validate(instance=config, schema=UPSUN_SCHEMA)
         return ["No errors found. YAML is valid."]
-    except jsonschema.exceptions.ValidationError as e:
-        return [f"Schema validation error: {e.message}"]
+    except ValidationError as e:
+        # More detailed error handling
+        error_path = " -> ".join(str(path) for path in e.path)
+        return [f"Schema validation error: {e.message} (at {error_path})"]
 
 # Example usage:
 if __name__ == "__main__":

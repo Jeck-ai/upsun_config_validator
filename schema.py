@@ -1,10 +1,10 @@
-
 # schema.py
 UPSUN_SCHEMA = {
     "type": "object",
     "properties": {
         "applications": {
             "type": "object",
+            "minProperties": 1,
             "additionalProperties": {
                 "type": "object",
                 "properties": {
@@ -41,6 +41,7 @@ UPSUN_SCHEMA = {
                             },
                             "locations": {
                                 "type": "object",
+                                "minProperties": 1,
                                 "additionalProperties": {
                                     "type": "object",
                                     "properties": {
@@ -141,6 +142,7 @@ UPSUN_SCHEMA = {
         },
         "routes": {
             "type": "object",
+            "minProperties": 1,
             "patternProperties": {
                 "^https?://(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*\\{default\\}/?.*$": {
                     "type": "object",
