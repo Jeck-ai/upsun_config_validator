@@ -1,0 +1,44 @@
+applications:
+  frontend:
+    type: nodejs@16
+    stack: ['nodejs@16', { nodejs: { extensions: ['.js', '.jsx'] } }]
+    web:
+      commands:
+        start: npm run start
+      locations:
+        '/':
+          index: ['index.html']
+          passthru: true
+        '/assets': 
+          expires: 5m
+          allow: true
+    hooks:
+      build: |
+        npm ci
+        npm run build
+    disk: 1024
+    relationships:
+      backend: 
+        service: 'backend'  
+  backend:  
+    type: nodejs@16
+    web:
+      commands:
+        start: npm run start
+    disk: 512
+    relationships:
+      database: 
+        service: 'db'
+
+services:
+  db:
+    type: 'mongodb:5.0.0'
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "frontend:http"
+
+  "https://www.{default}/":
+    type: redirect
+    to: "https://{default}/"

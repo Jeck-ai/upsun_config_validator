@@ -1,0 +1,25 @@
+applications:
+  app:
+    type: rust@1.75
+    web:
+      commands:
+        start: cargo run --release
+      locations:
+        '/':
+          index: ['index.html']
+          passthru: true
+    hooks:
+      build: |
+        cargo build --release
+    relationships:
+      database: 
+        service: db
+        
+services:        
+  db:
+    type: postgresql:15
+    
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app:http"

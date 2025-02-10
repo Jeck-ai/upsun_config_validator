@@ -1,0 +1,25 @@
+applications:
+  app:
+    type: elixir@1.15
+    web:
+      commands:
+        start: mix phx.server
+      locations:
+        '/:
+          passthru: true 
+    hooks:
+      build: |
+        mix deps.get
+        mix compile
+    relationships:
+      database:
+        service: postgresql
+        
+services:
+  postgresql:
+    type: postgresql:15        
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app:http"

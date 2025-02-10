@@ -91,7 +91,7 @@ UPSUN_SCHEMA = {
                         "type": "object",
                         "properties": {
                             "python3": {"type": "object"},
-                            "nodejs": {"type": "object"},
+                            "nodejs": {"type": "object"}, 
                             "php": {"type": "object"}
                         }
                     },
@@ -113,7 +113,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|influxdb|kafka|varnish):[0-9]+\\.[0-9]+$"
+                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|influxdb|kafka|varnish|rust):[0-9]+\\.[0-9]+$"
                     },
                     "configuration": {
                         "type": "object",
