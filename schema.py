@@ -10,7 +10,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|rust|bun|perl|sbcl|perlcgi|phpcgi)@[0-9]+\\.[0-9]+$"
+                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|rust|bun|perl|sbcl|perlcgi|phpcgi)@[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
                     },
                     "stack": {
                         "type": "array",
@@ -24,7 +24,7 @@ UPSUN_SCHEMA = {
                                             "type": "object",
                                             "properties": {
                                                 "extensions": {"type": "array", "items": {"type": "string"}},
-                                                "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"}
+                                                "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"}
                                             }
                                         }
                                     },
@@ -54,7 +54,7 @@ UPSUN_SCHEMA = {
                                         "passthru": {"type": ["string", "boolean"]},
                                         "allow": {"type": "boolean"},
                                         "scripts": {"type": "boolean"},
-                                        "expires": {"type": "string", "pattern": "^[0-9]+[smhdwy]$"}
+                                        "expires": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?[smhdwy]$"}
                                     }
                                 }
                             }
@@ -133,7 +133,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|influxdb|kafka|varnish|rust):[0-9]+\\.[0-9]+$"
+                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|influxdb|kafka|varnish|rust):[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
                     },
                     "configuration": {
                         "type": "object",
@@ -141,7 +141,7 @@ UPSUN_SCHEMA = {
                             "schema": {"type": "string"},
                             "extensions": {"type": "array", "items": {"type": "string"}},
                             "vcl": {"type": "string"},
-                            "storage": {"type": "string", "pattern": "^[0-9]+\\s*[BKMGT]$"}
+                            "storage": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?\\s*[BKMGT]B?$"}
                         }
                     },
                     "relationships": {
