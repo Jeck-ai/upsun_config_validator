@@ -1,0 +1,23 @@
+applications:
+    app:
+        stack:
+            - elixir:999.999  # Invalid version number
+        web:
+            commands:
+                start: mix phx.server
+            locations:
+                "/":
+                    root: "priv/static"
+                    allow: true
+                    passthru: true
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

@@ -1,0 +1,15 @@
+applications:
+  web:
+    type: golang  # Missing required version
+    web:
+      commands:
+        start: ./main
+
+services:
+  db:
+    type: postgresql:15
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "web"

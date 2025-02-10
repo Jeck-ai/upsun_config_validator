@@ -1,0 +1,18 @@
+applications:
+  myapp:
+    type: "python@3.11"
+    web:
+      commands:
+        start: "gunicorn app:app"
+      locations:
+        '/':
+          root: 'public'
+          passthru: true
+          allow: true
+services:
+  cache:
+    type: "redis:6.2"
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "myapp:http"

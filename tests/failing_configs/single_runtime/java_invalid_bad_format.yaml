@@ -1,0 +1,24 @@
+applications:
+  app:
+    type: java@21
+    hooks:
+      build: |
+        ./mvnw package -DskipTests -Dquarkus.package.uber-jar=true
+    web:
+    commands:
+      start: java -jar $JAVA_OPTS -Dquarkus.http.port=$PORT jarfile.jar
+    variables:
+      env:
+        JAVA_MEMORY: -Xmx512m
+        JAVA_OPTS: -XX:+ExitOnOutOfMemoryError
+    disk: 1024
+
+services:
+  postgresql:
+    type: postgresql:15
+    disk: 2048
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app"

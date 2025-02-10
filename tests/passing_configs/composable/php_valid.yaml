@@ -1,0 +1,23 @@
+applications:
+    app:
+        stack:
+            - php:8.3
+        web:
+            locations:
+                "/":
+                    root: "public"
+                    passthru: "/index.php"
+                    index:
+                        - index.php
+                    allow: true
+        disk: 512
+
+services:
+    db:
+        type: mariadb:10.11
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

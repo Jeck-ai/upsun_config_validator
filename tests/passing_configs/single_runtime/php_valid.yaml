@@ -1,0 +1,25 @@
+applications:
+    app:
+        type: php:8.2
+        build:
+            flavor: none
+        web:
+            locations:
+                '/':
+                    root: 'public'
+                    index:
+                        - index.php
+                    scripts: true
+        disk: 512
+
+services:
+    db:
+        type: mariadb:10.4
+        disk: 1024
+    cache:
+        type: redis:7.0
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app" 

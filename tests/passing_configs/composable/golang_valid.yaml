@@ -1,0 +1,22 @@
+applications:
+    app:
+        stack:
+            - golang:1.21
+        web:
+            commands:
+                start: ./bin/app
+            locations:
+                "/":
+                    root: "public"
+                    allow: true
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

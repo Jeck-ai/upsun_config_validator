@@ -1,0 +1,17 @@
+applications:
+  app:
+    type: python:3.11
+    web:
+      commands:
+        start: python app.py
+    disk: 512
+
+services:
+  db:
+    type: postgresql:15
+    disk: 1024
+
+routes:
+  "https://{default}/":
+    type: upstream
+    # Missing required upstream property

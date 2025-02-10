@@ -1,0 +1,22 @@
+applications:
+    app:
+        stack:
+            - java:invalid  # Invalid version format
+        web:
+            commands:
+                start: java -jar application.jar
+            locations:
+                "/":
+                    root: "public"
+                    allow: true
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

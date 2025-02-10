@@ -1,0 +1,23 @@
+applications:
+    app:
+        stack:
+            - perl:5.38
+        web:
+            commands:
+                start: plackup -p $PORT app.psgi
+            locations:
+                "/":
+                    root: "public"
+                    allow: true
+                    passthru: true
+        disk: 512
+
+services:
+    db:
+        type: mariadb:10.6
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

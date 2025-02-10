@@ -1,0 +1,21 @@
+applications:
+    app:
+        type: rust:1.75
+        web:
+            commands:
+                start: ./target/release/app
+            locations:
+                "/":
+                    root: "static"
+                    allow: true
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

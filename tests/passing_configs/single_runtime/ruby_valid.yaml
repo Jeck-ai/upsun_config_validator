@@ -1,0 +1,45 @@
+applications:
+  app:
+    type: ruby@3.3
+    hooks:
+      build: |
+        mkdir -p "$PLATFORM_CACHE_DIR/bundle"
+        bundle install
+        SECRET_KEY_BASE=1 bundle exec rails assets:precompile
+      deploy: |
+        bundle exec rake db:migrate
+    web:
+      commands:
+        start: bundle exec puma -b unix://$SOCKET
+      locations:
+        "/":
+          root: "public"
+          passthru: true
+          expires: 1h
+    variables:
+      env:
+        RAILS_ENV: 'production'
+        RACK_ENV: 'production'
+        NODE_ENV: 'production'
+        BUNDLE_WITHOUT: 'development:test'
+    disk: 1024
+    mounts:
+      "/tmp":
+        source: local
+        source_path: tmp
+      "/log":
+        source: local
+        source_path: log
+      "/storage":
+        source: local
+        source_path: storage
+
+services:
+  database:
+    type: postgresql:15
+    disk: 2048
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app"

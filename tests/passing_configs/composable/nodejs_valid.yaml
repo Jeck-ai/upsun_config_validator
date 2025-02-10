@@ -1,0 +1,35 @@
+applications:
+    frontend:
+        type: nodejs:20
+        hooks:
+            build: |
+                npm install
+                npm run build
+        web:
+            commands:
+                start: npm run serve
+        disk: 512
+    backend:
+        type: nodejs:20
+        hooks:
+            build: |
+                npm install
+        web:
+            commands:
+                start: npm run api
+        disk: 512
+
+services:
+    db:
+        type: mongodb:5.0
+        disk: 1024
+    cache:
+        type: redis:7.0
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "frontend"
+    "https://{default}/api":
+        type: upstream
+        upstream: "backend" 

@@ -1,0 +1,20 @@
+applications:
+    app:
+        type: python:3.11
+        hooks:
+            build: |
+                pip install -r requirements.txt
+        web:
+            commands:
+                start: python app.py
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app" 

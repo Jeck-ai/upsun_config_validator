@@ -1,0 +1,11 @@
+applications:
+  myapp:
+    type: "nodejs@14.15.1"
+services:
+  database:
+    configuration:
+      storage: "10GB"
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "myapp:http"

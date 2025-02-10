@@ -1,0 +1,27 @@
+applications:
+  app:
+    type: elixir@1.15
+    hooks:
+      build: |
+        mix local.hex --force
+        mix local.rebar --force
+        mix do deps.get --only prod, deps.compile, compile
+      deploy: |
+        mix do ecto.setup
+    web:
+      commands:
+        start: mix phx.server
+    variables:
+      env:
+        MIX_ENV: 'prod'
+    disk: 512
+
+services:
+  postgresql:
+    type: postgresql:15
+    disk: 1024
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app"

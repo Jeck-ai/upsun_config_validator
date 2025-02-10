@@ -1,0 +1,10 @@
+applications:
+  myapp:
+    type: "nodejs@14.15.1"
+services:
+  database:
+    type: "mariadb:10.5"
+routes:
+  "https://www.{default}/":   # Invalid: key must be exactly "http(s)://{default}/" (optionally without trailing slash)
+    type: redirect
+    to: "https://{default}/"

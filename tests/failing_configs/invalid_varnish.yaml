@@ -1,0 +1,16 @@
+applications:
+  web:
+    type: nodejs@18
+    web:
+      commands:
+        start: npm start
+
+services:
+  varnish:
+    type: varnish:6.0
+    # Missing required vcl configuration
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "web"

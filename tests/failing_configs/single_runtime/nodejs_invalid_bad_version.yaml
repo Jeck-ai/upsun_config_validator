@@ -1,0 +1,22 @@
+applications:
+    app:
+        type: nodejs:999.999
+        hooks:
+            build: |
+                npm install
+        web:
+            commands:
+                start: npm start
+        disk: 512
+
+services:
+    # Invalid service type format
+    db:
+        type: invalid-mongodb
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        # Missing required upstream property
+        something_else: "value" 

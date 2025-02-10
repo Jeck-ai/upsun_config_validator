@@ -1,0 +1,13 @@
+applications:
+    app:
+        type: python:3.11
+        # Invalid format - web should be an object with commands
+        web: python app.py
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+# Missing required routes key 

@@ -1,0 +1,23 @@
+applications:
+    app:
+        stack:
+            - ruby:3.3
+        web:
+            commands:
+                start: bundle exec puma -C config/puma.rb
+            locations:
+                "/":
+                    root: "public"
+                    passthru: true
+                    allow: true
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

@@ -1,0 +1,10 @@
+applications:
+  myapp:
+    type: "ruby@2.7.0"   # Invalid: "ruby" is not permitted by the regex.
+services:
+  database:
+    type: "mariadb:10.5"
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "myapp:http"

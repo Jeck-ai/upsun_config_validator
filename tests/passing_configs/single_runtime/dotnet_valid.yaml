@@ -1,0 +1,21 @@
+applications:
+    app:
+        type: dotnet:8.0
+        web:
+            commands:
+                start: dotnet application.dll
+            locations:
+                "/":
+                    root: ""
+                    allow: true
+        disk: 512
+
+services:
+    db:
+        type: postgresql:15
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"

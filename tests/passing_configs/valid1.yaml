@@ -1,0 +1,23 @@
+applications:
+  myapp:
+    type: "nodejs@14.15.1"
+    web:
+      commands:
+        start: "npm start"
+      locations:
+        "/":
+          root: "public"
+          index: ["index.html"]
+services:
+  database:
+    type: "mariadb:10.5"
+    configuration:
+      storage: "10GB"
+    relationships:
+      app:
+        service: "myapp"
+        endpoint: "db-url"
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "myapp:http"

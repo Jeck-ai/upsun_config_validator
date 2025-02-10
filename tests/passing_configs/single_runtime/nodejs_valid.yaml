@@ -1,0 +1,20 @@
+applications:
+    app:
+        type: nodejs:20
+        hooks:
+            build: |
+                npm install
+        web:
+            commands:
+                start: npm start
+        disk: 512
+
+services:
+    db:
+        type: mongodb:5.0
+        disk: 1024
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app" 
