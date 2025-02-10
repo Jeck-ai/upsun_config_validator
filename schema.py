@@ -10,7 +10,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|rust|bun|perl|sbcl|perlcgi|phpcgi)@[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|perl|sbcl|perlcgi|phpcgi)@[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
                     },
                     "stack": {
                         "type": "array",
@@ -20,7 +20,7 @@ UPSUN_SCHEMA = {
                                 {
                                     "type": "object",
                                     "patternProperties": {
-                                        "^(php|python|nodejs|ruby|java|golang|dotnet|clojure|elixir|rust|bun|perl|sbcl)$": {
+                                        "^(php|python|nodejs|ruby|java|golang|dotnet|clojure|elixir|perl|sbcl)$": {
                                             "type": "object",
                                             "properties": {
                                                 "extensions": {"type": "array", "items": {"type": "string"}},
@@ -133,7 +133,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|influxdb|kafka|varnish|rust):[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb-enterprise|influxdb|kafka|varnish):[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
                     },
                     "configuration": {
                         "type": "object",
