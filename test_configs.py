@@ -88,7 +88,7 @@ def process_yaml_file(args):
             print(f"[{timestamp}] {upsun_dir}: Pushing {yaml_basename}")
             
             # Git push with full output capture
-            push = subprocess.run(['git', 'push', '--set-upstream', remote_name, 'main'], 
+            push = subprocess.run(['git', 'push', '--set-upstream', 'upsun', 'main'], 
                                 cwd=upsun_dir,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,

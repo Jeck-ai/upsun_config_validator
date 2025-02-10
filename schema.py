@@ -10,9 +10,8 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|perl|sbcl|perlcgi|phpcgi|rust)(@[0-9]+\\.[0-9]+(\\.[0-9]+)?)?$"
+                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|perl|sbcl|perlcgi|phpcgi|rust)@[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
                     },
-                    # Removing 'disk' and adding equivalent 'storage' at service level
                     "stack": {
                         "type": "array",
                         "items": {
@@ -141,11 +140,7 @@ UPSUN_SCHEMA = {
                         "properties": {
                             "schema": {"type": "string"},
                             "extensions": {"type": "array", "items": {"type": "string"}},
-                            # Make vcl required for varnish, but only for varnish service
-                            "vcl": {"type": "string", "oneOf": [
-                                {"type": "string", "$comment": "VCL config is required for varnish service"},
-                                {"type": "null", "$comment": "VCL can be null for non-varnish services"}
-                            ]},
+                            "vcl": {"type": "string"},
                             "storage": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?\\s*[BKMGT]B?$"}
                         },
                         # Add a special condition for varnish service to require VCL
