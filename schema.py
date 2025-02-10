@@ -1,4 +1,18 @@
 # schema.py
+ALLOWED_VERSIONS = {
+    "nodejs": ["22", "20", "18", "16"],
+    "php": ["8.4", "8.3", "8.2", "8.1"],
+    "python": ["3.12", "3.11", "3.10", "3.9", "3.8"],
+    "golang": ["1.23", "1.22", "1.21", "1.20", "1.19"],
+    "ruby": ["3.3", "3.2", "3.1", "3.0"],
+    "java": ["21", "19", "18", "17", "11", "8"],
+    "dotnet": ["8.0", "6.0", "7.0"],
+    "lisp": ["2.1", "2.0", "1.5"],
+    "elixir": ["1.15", "1.14"],
+    "rust": ["1"],
+    "bun": ["1.0"]
+}
+
 UPSUN_SCHEMA = {
     "type": "object",
     "properties": {
@@ -10,7 +24,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|perl|sbcl|perlcgi|phpcgi|rust)@[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+                        "pattern": "^(nodejs|php|python|golang|ruby|java|dotnet|static|clojure|elixir|perl|sbcl|perlcgi|phpcgi|rust|bun)[@:][0-9]+(\\.[0-9]+)*$"
                     },
                     "stack": {
                         "type": "array",
@@ -19,16 +33,10 @@ UPSUN_SCHEMA = {
                                 {"type": "string"},
                                 {
                                     "type": "object",
-                                    "patternProperties": {
-                                        "^(php|python|nodejs|ruby|java|golang|dotnet|clojure|elixir|perl|sbcl|rust)$": {
-                                            "type": "object",
-                                            "properties": {
-                                                "extensions": {"type": "array", "items": {"type": "string"}},
-                                                "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"}
-                                            }
-                                        }
-                                    },
-                                    "additionalProperties": false
+                                    "properties": {
+                                        "extensions": {"type": "array", "items": {"type": "string"}},
+                                        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"}
+                                    }
                                 }
                             ]
                         }
@@ -38,7 +46,8 @@ UPSUN_SCHEMA = {
                         "properties": {
                             "commands": {
                                 "type": "object",
-                                "additionalProperties": {"type": "string"}
+                                "additionalProperties": {"type": "string"},
+                                "required": ["start"]
                             },
                             "locations": {
                                 "type": "object",
@@ -47,10 +56,6 @@ UPSUN_SCHEMA = {
                                     "type": "object",
                                     "properties": {
                                         "root": {"type": "string"},
-                                        "index": {
-                                            "type": "array",
-                                            "items": {"type": "string"}
-                                        },
                                         "passthru": {"type": ["string", "boolean"]},
                                         "allow": {"type": "boolean"},
                                         "scripts": {"type": "boolean"},
@@ -69,61 +74,30 @@ UPSUN_SCHEMA = {
                         }
                     },
                     "relationships": {
-                        "type": "object",
+                        "type": ["object", "null"],
                         "additionalProperties": {
-                            "type": "object",
+                            "type": ["object", "string"],
                             "properties": {
                                 "service": {"type": "string"},
                                 "endpoint": {"type": "string"}
-                            },
-                            "required": ["service"]
-                        }
-                    },
-                    "mounts": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "object",
-                            "properties": {
-                                "source": {"type": "string"},
-                                "source_path": {"type": "string"}
-                            },
-                            "required": ["source"]
-                        }
-                    },
-                    "dependencies": {
-                        "type": "object",
-                        "properties": {
-                            "python3": {
-                                "type": "object",
-                                "properties": {
-                                    "pipenv": {"type": "string"},
-                                    "poetry": {"type": "string"}
-                                }
-                            },
-                            "nodejs": {
-                                "type": "object",
-                                "properties": {
-                                    "yarn": {"type": "string"},
-                                    "npm": {"type": "string"}
-                                }
-                            },
-                            "php": {
-                                "type": "object",
-                                "properties": {
-                                    "composer": {"type": "string"}
-                                }
                             }
                         }
-                    },
-                    "commands": {
-                        "type": "object",
-                        "additionalProperties": {"type": "string"}
                     }
                 },
+                "allOf": [
+                    {
+                        "not": {
+                            "properties": {
+                                "disk": {}
+                            }
+                        }
+                    }
+                ],
                 "oneOf": [
                     {"required": ["type"]},
                     {"required": ["stack"]}
-                ]
+                ],
+                "additionalProperties": False
             }
         },
         "services": {
@@ -133,7 +107,7 @@ UPSUN_SCHEMA = {
                 "properties": {
                     "type": {
                         "type": "string",
-                        "pattern": "^(mariadb|mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|mongodb-enterprise|influxdb|kafka|varnish):[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+                        "pattern": "^(mariadb|mysql|oracle-mysql|postgresql|redis|memcached|rabbitmq|solr|elasticsearch|mongodb|mongodb-enterprise|influxdb|kafka|varnish|opensearch):[0-9]+(\\.[0-9]+)*$"
                     },
                     "configuration": {
                         "type": "object",
@@ -143,36 +117,32 @@ UPSUN_SCHEMA = {
                             "vcl": {"type": "string"},
                             "storage": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?\\s*[BKMGT]B?$"}
                         },
-                        # Add a special condition for varnish service to require VCL
-                        "if": {
-                            "properties": {
-                                "type": {"pattern": "^varnish:"}
+                        "allOf": [
+                            {
+                                "if": {
+                                    "properties": {
+                                        "type": {"pattern": "^varnish:"}
+                                    }
+                                },
+                                "then": {
+                                    "required": ["vcl"]
+                                }
                             }
-                        },
-                        "then": {
-                            "required": ["vcl"]
-                        }
-                    },
-                    "relationships": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "object",
-                            "properties": {
-                                "service": {"type": "string"},
-                                "endpoint": {"type": "string"}
-                            },
-                            "required": ["service"]
-                        }
+                        ]
                     }
                 },
-                "required": ["type"]
+                "not": {
+                    "required": ["disk"]
+                },
+                "required": ["type"],
+                "additionalProperties": False
             }
         },
         "routes": {
             "type": "object",
             "minProperties": 1,
             "patternProperties": {
-                "^(https?://)?([a-zA-Z0-9.-]+\\.)*\\{default\\}(/.*)?$": {
+                "^https?://({default}|[-a-zA-Z0-9]+\\.{default})(/.*)?$": {
                     "type": "object",
                     "properties": {
                         "type": {"type": "string", "enum": ["upstream", "redirect"]},
@@ -185,12 +155,6 @@ UPSUN_SCHEMA = {
                                 "default_ttl": {"type": "integer", "minimum": 0},
                                 "cookies": {"type": "array", "items": {"type": "string"}},
                                 "headers": {"type": "array", "items": {"type": "string"}}
-                            }
-                        },
-                        "ssi": {
-                            "type": "object",
-                            "properties": {
-                                "enabled": {"type": "boolean"}
                             }
                         }
                     },
@@ -207,9 +171,9 @@ UPSUN_SCHEMA = {
                     ]
                 }
             },
-            "additionalProperties": false
+            "additionalProperties": False
         }
     },
     "required": ["applications"],
-    "additionalProperties": false
+    "additionalProperties": False
 }
