@@ -1,15 +1,14 @@
 applications:
   app:
-    type: 'rust:1'
+    type: 'golang@1.19'
     web:
       commands:
-        start: './target/release/hello'
+        start: ./app
       locations:
         '/':
           passthru: true
     hooks:
-      build: |
-        cargo build --release
+      build: go build -o app
     relationships:
       cache: 'cache:redis'
 

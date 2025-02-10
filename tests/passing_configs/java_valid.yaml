@@ -1,15 +1,14 @@
 applications:
   app:
-    type: 'rust:1'
+    type: 'java@17'
     web:
       commands:
-        start: './target/release/hello'
+        start: java -jar app.jar
       locations:
         '/':
           passthru: true
     hooks:
-      build: |
-        cargo build --release
+      build: ./mvnw package
     relationships:
       cache: 'cache:redis'
 

@@ -1,23 +1,20 @@
 applications:
   app:
-    type: 'rust:1'
+    type: 'python@3.9'
     web:
       commands:
-        start: './target/release/hello'
+        start: python server.py
       locations:
         '/':
           passthru: true
-    hooks:
-      build: |
-        cargo build --release
     relationships:
-      cache: 'cache:redis'
+      database: 'db:postgresql'
 
 services:
-  cache:
-    type: redis:6.0
+  db:
+    type: postgresql:13
     configuration:
-      storage: 256MB
+      storage: 1GB
 
 routes:
   "https://{default}/":

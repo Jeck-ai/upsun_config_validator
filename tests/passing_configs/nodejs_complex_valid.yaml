@@ -1,37 +1,50 @@
 applications:
-  web:
-    type: nodejs@18
-    hooks:
-      build: |
-        npm install
-        npm run build
+  api:
+    type: 'nodejs@16'
     web:
       commands:
-        start: npm run start:prod
+        start: node server.js
       locations:
-        "/assets":
-          root: "dist/assets"
-          expires: 1y
-          allow: true
-    mounts:
-      "/uploads":
-        source: storage
-        source_path: uploads
-
+        '/':
+          passthru: true
+    relationships:
+      database: 'db:postgresql'
+      cache: 'cache:redis'
+      search: 'search:elasticsearch'
   worker:
-    type: nodejs@18
-    commands:
-      start: npm run worker
+    type: 'nodejs@16'
+    web:
+      commands:
+        start: node worker.js
+    relationships:
+      database: 'db:postgresql'
+      queue: 'queue:rabbitmq'
 
 services:
   db:
-    type: postgresql:15
+    type: postgresql:13
     configuration:
-      storage: "2GB"
+      storage: 2GB
   cache:
-    type: redis:7.0
+    type: redis:6.0
+    configuration:
+      storage: 512MB
+  search:
+    type: elasticsearch:7.9
+    configuration:
+      storage: 1GB
+  queue:
+    type: rabbitmq:3.8
+    configuration:
+      storage: 512MB
 
 routes:
   "https://{default}/":
     type: upstream
-    upstream: "web"
+    upstream: "api:http"
+    cache:
+      enabled: true
+      default_ttl: 3600
+      headers:
+        - Accept
+        - Accept-Language

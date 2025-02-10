@@ -1,0 +1,24 @@
+applications:
+  app:
+    type: 'php@8.2'
+    web:
+      locations:
+        '/':
+          root: 'public'
+          passthru: '/index.php'
+          index:
+            - index.php
+          scripts: true
+    relationships:
+      database: 'db:mysql'
+
+services:
+  db:
+    type: mariadb:10.4
+    configuration:
+      storage: 2048MB
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app:http"

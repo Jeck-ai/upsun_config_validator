@@ -1,43 +1,34 @@
-
 applications:
   frontend:
-    type: nodejs@16.0
-    stack: ['nodejs@16.0', { nodejs: { extensions: ['.js', '.jsx'] } }]
+    type: 'nodejs@16'
     web:
       commands:
-        start: npm run start
+        start: npm start
       locations:
         '/':
-          index: ['index.html']
+          root: 'public'
           passthru: true
-        '/assets': 
-          expires: 5m
-          allow: true
-    hooks:
-      build: |
-        npm ci
-        npm run build
-    relationships:
-      backend: 
-        service: 'backend'  
-  backend:  
-    type: nodejs@16.0
+          index:
+            - index.html
+  backend:
+    type: 'nodejs@16'
     web:
       commands:
-        start: npm run start
-    relationships:
-      database: 
-        service: 'db'
+        start: node server.js
+      locations:
+        '/api':
+          passthru: true
 
 services:
   db:
-    type: 'mongodb:5.0.0'
+    type: mongodb:5.0
+    configuration:
+      storage: 512MB
 
 routes:
   "https://{default}/":
     type: upstream
     upstream: "frontend:http"
-
-  "https://www.{default}/":
-    type: redirect
-    to: "https://{default}/" 
+  "https://{default}/api":
+    type: upstream
+    upstream: "backend:http"
