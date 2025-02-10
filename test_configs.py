@@ -1,14 +1,11 @@
-
 import os
 import shutil
 import subprocess
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from pathlib import Path
-import yaml
+from datetime import datetime
 import time
 import fcntl
 import errno
-from datetime import datetime
 
 class FileLock:
     def __init__(self, path):
@@ -54,10 +51,29 @@ def log_to_file(log_dir, upsun_dir, yaml_file, message):
         f.write(f"\n=== {yaml_file} ===\n")
         f.write(f"[{timestamp}] {message}\n")
 
+def setup_git_remote(upsun_dir, dir_num):
+    remote_name = f"upsun{dir_num}"
+    try:
+        # Remove existing remote if any
+        subprocess.run(['git', 'remote', 'remove', remote_name], 
+                      cwd=upsun_dir, capture_output=True, text=True)
+    except subprocess.CalledProcessError:
+        pass
+
+    # Add new remote
+    result = subprocess.run(['git', 'config', '--get', f'remote.{remote_name}.url'],
+                          cwd=upsun_dir, capture_output=True, text=True)
+    
+    if result.returncode != 0:
+        subprocess.run(['git', 'remote', 'add', remote_name, f'upsun{dir_num}:project.git'],
+                      cwd=upsun_dir, check=True)
+
 def process_yaml_file(args):
-    upsun_dir, yaml_file, log_dir = args
+    upsun_dir, yaml_file, log_dir, dir_num = args
     yaml_basename = os.path.basename(yaml_file)
     timestamp = datetime.now().strftime('%H:%M:%S')
+    remote_name = f"upsun{dir_num}"
+    
     try:
         log_to_file(log_dir, upsun_dir, yaml_basename, f"Starting processing of {yaml_basename}")
         print(f"\n[{timestamp}] {upsun_dir}: Starting {yaml_basename}")
@@ -72,6 +88,9 @@ def process_yaml_file(args):
         
         # Git and Upsun operations with lock
         with FileLock(upsun_dir):
+            # Setup git remote
+            setup_git_remote(upsun_dir, dir_num)
+            
             # Git operations
             git_add = subprocess.run(['git', 'add', '.'], cwd=upsun_dir,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -89,7 +108,7 @@ def process_yaml_file(args):
             print(f"[{timestamp}] {upsun_dir}: Pushing {yaml_basename}")
             
             # Git push with full output capture
-            push = subprocess.run(['git', 'push', '--set-upstream', 'upsun', 'main'], 
+            push = subprocess.run(['git', 'push', '--set-upstream', remote_name, 'main'], 
                                 cwd=upsun_dir,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
@@ -167,9 +186,9 @@ def main():
     
     # Create work items
     work_items = []
-    for upsun_dir, files in zip(upsun_dirs, file_groups):
+    for i, (upsun_dir, files) in enumerate(zip(upsun_dirs, file_groups), 1):
         for file in files:
-            work_items.append((upsun_dir, file, log_dir))
+            work_items.append((upsun_dir, file, log_dir, i))
     
     # Clean up any existing lock files
     for upsun_dir in upsun_dirs:
