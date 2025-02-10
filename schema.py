@@ -1,3 +1,4 @@
+
 # schema.py
 UPSUN_SCHEMA = {
     "type": "object",

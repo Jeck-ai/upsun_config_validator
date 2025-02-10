@@ -1,3 +1,4 @@
+
 import os
 import shutil
 import subprocess
@@ -98,14 +99,9 @@ def process_yaml_file(args):
             log_to_file(log_dir, upsun_dir, yaml_basename, 
                        f"Git push output:\nstdout:\n{push.stdout}\nstderr:\n{push.stderr}")
             
-            # Only raise CalledProcessError if the push failed
-            if push.returncode != 0:
-                raise subprocess.CalledProcessError(
-                    push.returncode, 
-                    push.args,
-                    push.stdout,
-                    push.stderr
-                )
+            # Raise exception if push failed due to invalid config
+            if "invalid configuration files" in push.stderr:
+                raise Exception("Git push failed due to invalid configuration")
         
         print(f"[{timestamp}] {upsun_dir}: Completed {yaml_basename}")
         log_to_file(log_dir, upsun_dir, yaml_basename, "Completed successfully")

@@ -1,7 +1,8 @@
+
 applications:
   frontend:
-    type: nodejs@16
-    stack: ['nodejs@16', { nodejs: { extensions: ['.js', '.jsx'] } }]
+    type: nodejs@16.0
+    stack: ['nodejs@16.0', { nodejs: { extensions: ['.js', '.jsx'] } }]
     web:
       commands:
         start: npm run start
@@ -16,16 +17,14 @@ applications:
       build: |
         npm ci
         npm run build
-    disk: 1024
     relationships:
       backend: 
         service: 'backend'  
   backend:  
-    type: nodejs@16
+    type: nodejs@16.0
     web:
       commands:
         start: npm run start
-    disk: 512
     relationships:
       database: 
         service: 'db'
@@ -41,4 +40,4 @@ routes:
 
   "https://www.{default}/":
     type: redirect
-    to: "https://{default}/"
+    to: "https://{default}/" 

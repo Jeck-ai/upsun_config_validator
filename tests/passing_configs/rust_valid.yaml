@@ -1,6 +1,7 @@
+
 applications:
   app:
-    type: rust@1.75
+    type: rust@1.75.0
     web:
       commands:
         start: cargo run --release
@@ -17,7 +18,7 @@ applications:
         
 services:        
   db:
-    type: postgresql:15
+    type: postgresql:15.0
     
 routes:
   "https://{default}/":
