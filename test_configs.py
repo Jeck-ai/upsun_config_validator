@@ -54,18 +54,17 @@ def log_to_file(log_dir, upsun_dir, yaml_file, message):
 def setup_git_remote(upsun_dir, dir_num):
     remote_name = f"upsun{dir_num}"
     try:
-        # Remove existing remote if any
         subprocess.run(['git', 'remote', 'remove', remote_name], 
                       cwd=upsun_dir, capture_output=True, text=True)
     except subprocess.CalledProcessError:
         pass
 
-    # Add new remote
+    # Add new remote with correct Upsun SSH URL format
     result = subprocess.run(['git', 'config', '--get', f'remote.{remote_name}.url'],
                           cwd=upsun_dir, capture_output=True, text=True)
     
     if result.returncode != 0:
-        subprocess.run(['git', 'remote', 'add', remote_name, f'upsun{dir_num}:project.git'],
+        subprocess.run(['git', 'remote', 'add', remote_name, f'api@ssh.upsun.com:project{dir_num}.git'],
                       cwd=upsun_dir, check=True)
 
 def process_yaml_file(args):
