@@ -1,18 +1,24 @@
+
+# Valid YAML config without disk config
 applications:
-  myapp:
-    type: "python@3.11"
+  frontend:
+    type: nodejs@16
     web:
-      commands:
-        start: "gunicorn app:app"
+      commands: 
+        start: npm start
       locations:
         '/':
-          root: 'public'
+          root: public
+          index: ['index.html']
+  backend: 
+    type: nodejs@16
+    web:
+      commands:
+        start: npm start
+      locations:
+        '/api':
+          root: api
           passthru: true
-          allow: true
 services:
-  cache:
-    type: "redis:6.2"
-routes:
-  "https://{default}/":
-    type: upstream
-    upstream: "myapp:http"
+  db:
+    type: postgresql:13

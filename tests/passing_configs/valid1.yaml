@@ -1,23 +1,20 @@
+
+# Valid YAML config without disk config
 applications:
-  myapp:
-    type: "nodejs@14.15.1"
+  app:
+    type: nodejs@16
     web:
       commands:
-        start: "npm start"
+        start: node index.js
       locations:
-        "/":
-          root: "public"
-          index: ["index.html"]
+        '/.well-known/jwks.json':
+          root: keys/public
+        '/':
+          allow: true
+          passthru: true
 services:
-  database:
-    type: "mariadb:10.5"
+  db:
+    type: mariadb:10.5
     configuration:
-      storage: "10GB"
-    relationships:
-      app:
-        service: "myapp"
-        endpoint: "db-url"
-routes:
-  "https://{default}/":
-    type: upstream
-    upstream: "myapp:http"
+      schemas:
+        - main
