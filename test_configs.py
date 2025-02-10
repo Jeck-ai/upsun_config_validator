@@ -51,22 +51,6 @@ def log_to_file(log_dir, upsun_dir, yaml_file, message):
         f.write(f"\n=== {yaml_file} ===\n")
         f.write(f"[{timestamp}] {message}\n")
 
-def setup_git_remote(upsun_dir, dir_num):
-    remote_name = f"upsun{dir_num}"
-    try:
-        subprocess.run(['git', 'remote', 'remove', remote_name], 
-                      cwd=upsun_dir, capture_output=True, text=True)
-    except subprocess.CalledProcessError:
-        pass
-
-    # Add new remote with correct Upsun SSH URL format
-    result = subprocess.run(['git', 'config', '--get', f'remote.{remote_name}.url'],
-                          cwd=upsun_dir, capture_output=True, text=True)
-    
-    if result.returncode != 0:
-        subprocess.run(['git', 'remote', 'add', remote_name, f'api@ssh.upsun.com:project{dir_num}.git'],
-                      cwd=upsun_dir, check=True)
-
 def process_yaml_file(args):
     upsun_dir, yaml_file, log_dir, dir_num = args
     yaml_basename = os.path.basename(yaml_file)
@@ -87,9 +71,6 @@ def process_yaml_file(args):
         
         # Git and Upsun operations with lock
         with FileLock(upsun_dir):
-            # Setup git remote
-            setup_git_remote(upsun_dir, dir_num)
-            
             # Git operations
             git_add = subprocess.run(['git', 'add', '.'], cwd=upsun_dir,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
