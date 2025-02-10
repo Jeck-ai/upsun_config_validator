@@ -3,10 +3,22 @@ import jsonschema
 from jsonschema import validate, ValidationError
 from schema import UPSUN_SCHEMA
 
+def flatten_validation_error(error):
+    """
+    Convert a complex validation error into a more readable format.
+    """
+    error_path = " -> ".join(str(path) for path in error.path)
+    return {
+        'message': error.message,
+        'path': error_path,
+        'validator': error.validator,
+        'validator_value': error.validator_value
+    }
+
 def validate_upsun_config(yaml_string):
     """
     Validates the provided YAML string against the JSON schema for .upsun/config.yaml.
-    Returns a list of errors if found.
+    Returns a list of detailed errors if found.
     """
     try:
         config = yaml.safe_load(yaml_string)
@@ -22,9 +34,16 @@ def validate_upsun_config(yaml_string):
         validate(instance=config, schema=UPSUN_SCHEMA)
         return ["No errors found. YAML is valid."]
     except ValidationError as e:
-        # More detailed error handling
-        error_path = " -> ".join(str(path) for path in e.path)
-        return [f"Schema validation error: {e.message} (at {error_path})"]
+        # More granular error handling
+        all_errors = []
+        for error in sorted(e.context, key=lambda e: e.path):
+            detailed_error = flatten_validation_error(error)
+            error_msg = f"Schema validation error: {detailed_error['message']} (at {detailed_error['path']})"
+            if detailed_error['validator'] == 'pattern':
+                error_msg += f" (expected format: {detailed_error['validator_value']})"
+            all_errors.append(error_msg)
+        
+        return all_errors if all_errors else [f"Schema validation error: {e.message}"]
 
 # Example usage:
 if __name__ == "__main__":

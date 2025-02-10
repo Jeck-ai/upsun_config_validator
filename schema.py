@@ -23,7 +23,8 @@ UPSUN_SCHEMA = {
                                         "^(php|python|nodejs|ruby|java|golang|dotnet|clojure|elixir|rust|bun|perl|sbcl)$": {
                                             "type": "object",
                                             "properties": {
-                                                "extensions": {"type": "array", "items": {"type": "string"}}
+                                                "extensions": {"type": "array", "items": {"type": "string"}},
+                                                "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"}
                                             }
                                         }
                                     },
@@ -53,7 +54,7 @@ UPSUN_SCHEMA = {
                                         "passthru": {"type": ["string", "boolean"]},
                                         "allow": {"type": "boolean"},
                                         "scripts": {"type": "boolean"},
-                                        "expires": {"type": "string"}
+                                        "expires": {"type": "string", "pattern": "^[0-9]+[smhdwy]$"}
                                     }
                                 }
                             }
@@ -92,9 +93,26 @@ UPSUN_SCHEMA = {
                     "dependencies": {
                         "type": "object",
                         "properties": {
-                            "python3": {"type": "object"},
-                            "nodejs": {"type": "object"}, 
-                            "php": {"type": "object"}
+                            "python3": {
+                                "type": "object",
+                                "properties": {
+                                    "pipenv": {"type": "string"},
+                                    "poetry": {"type": "string"}
+                                }
+                            },
+                            "nodejs": {
+                                "type": "object",
+                                "properties": {
+                                    "yarn": {"type": "string"},
+                                    "npm": {"type": "string"}
+                                }
+                            },
+                            "php": {
+                                "type": "object",
+                                "properties": {
+                                    "composer": {"type": "string"}
+                                }
+                            }
                         }
                     },
                     "commands": {
@@ -122,7 +140,8 @@ UPSUN_SCHEMA = {
                         "properties": {
                             "schema": {"type": "string"},
                             "extensions": {"type": "array", "items": {"type": "string"}},
-                            "vcl": {"type": "string"}
+                            "vcl": {"type": "string"},
+                            "storage": {"type": "string", "pattern": "^[0-9]+\\s*[BKMGT]$"}
                         }
                     },
                     "relationships": {
@@ -144,7 +163,7 @@ UPSUN_SCHEMA = {
             "type": "object",
             "minProperties": 1,
             "patternProperties": {
-                "^https?://(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*\\{default\\}/?.*$": {
+                "^(https?://)?([a-zA-Z0-9.-]+\\.)*\\{default\\}(/.*)?$": {
                     "type": "object",
                     "properties": {
                         "type": {"type": "string", "enum": ["upstream", "redirect"]},
@@ -154,7 +173,7 @@ UPSUN_SCHEMA = {
                             "type": "object",
                             "properties": {
                                 "enabled": {"type": "boolean"},
-                                "default_ttl": {"type": "integer"},
+                                "default_ttl": {"type": "integer", "minimum": 0},
                                 "cookies": {"type": "array", "items": {"type": "string"}},
                                 "headers": {"type": "array", "items": {"type": "string"}}
                             }
