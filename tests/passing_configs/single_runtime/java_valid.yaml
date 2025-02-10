@@ -11,12 +11,10 @@ applications:
       env:
         JAVA_MEMORY: -Xmx512m
         JAVA_OPTS: -XX:+ExitOnOutOfMemoryError
-    disk: 1024
 
 services:
   postgresql:
     type: postgresql:15
-    disk: 2048
 
 routes:
   "https://{default}/":

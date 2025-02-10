@@ -38,9 +38,13 @@ def get_yaml_files(test_dir):
                 yaml_files.append(os.path.join(root, file))
     return yaml_files
 
+import random
+
 def divide_files(yaml_files, num_groups=3):
+    files = yaml_files.copy()
+    random.shuffle(files)
     groups = [[] for _ in range(num_groups)]
-    for i, file in enumerate(yaml_files):
+    for i, file in enumerate(files):
         groups[i % num_groups].append(file)
     return groups
 
@@ -177,16 +181,19 @@ def main():
             os.unlink(lockfile)
     
     # Process files in parallel using as_completed for better output handling
+    failures = []
     with ProcessPoolExecutor(max_workers=3) as executor:
         future_to_work = {executor.submit(process_yaml_file, item): item for item in work_items}
         for future in as_completed(future_to_work):
             result = future.result()
             if result['status'] == 'failure':
-                print(f"\nFailed in {result['dir']}: {result['error']}")
-                # Cancel all pending futures
-                for f in future_to_work:
-                    f.cancel()
-                return 1
+                failures.append(f"\nFailed in {result['dir']}: {result['error']}")
+
+    if failures:
+        print("\nFailures:")
+        for failure in failures:
+            print(failure)
+        return 1
     
     return 0
 
