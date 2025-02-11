@@ -7,12 +7,10 @@ applications:
         web:
             commands:
                 start: npm start
-        disk: 512
 
 services:
     db:
         type: mongodb:5.0
-        disk: 1024
 
 routes:
     "https://{default}/":

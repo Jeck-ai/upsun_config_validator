@@ -1,5 +1,4 @@
 
-# Valid YAML config without disk config
 applications:
   frontend:
     type: nodejs@16

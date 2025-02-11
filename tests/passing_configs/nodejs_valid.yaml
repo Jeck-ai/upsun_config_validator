@@ -22,8 +22,6 @@ applications:
 services:
   db:
     type: mongodb:5.0
-    configuration:
-      storage: 512MB
 
 routes:
   "https://{default}/":

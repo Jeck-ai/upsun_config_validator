@@ -8,12 +8,12 @@ applications:
                 "/":
                     root: ""
                     allow: true
-        disk: 512
+
 
 services:
     db:
         type: postgresql:15
-        disk: 1024
+
 
 routes:
     "https://{default}/":

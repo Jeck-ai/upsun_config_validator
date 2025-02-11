@@ -14,12 +14,12 @@ applications:
     variables:
       env:
         MIX_ENV: 'prod'
-    disk: 512
+
 
 services:
   postgresql:
     type: postgresql:15
-    disk: 1024
+
 
 routes:
   "https://{default}/":

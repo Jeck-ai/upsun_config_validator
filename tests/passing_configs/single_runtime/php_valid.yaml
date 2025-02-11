@@ -10,12 +10,10 @@ applications:
                     index:
                         - index.php
                     scripts: true
-        disk: 512
 
 services:
     db:
         type: mariadb:10.4
-        disk: 1024
     cache:
         type: redis:7.0
 

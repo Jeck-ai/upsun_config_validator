@@ -15,8 +15,7 @@ applications:
 services:
   db:
     type: mariadb:10.4
-    configuration:
-      storage: 2048MB
+
 
 routes:
   "https://{default}/":

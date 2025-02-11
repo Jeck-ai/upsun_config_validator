@@ -22,7 +22,6 @@ applications:
         RACK_ENV: 'production'
         NODE_ENV: 'production'
         BUNDLE_WITHOUT: 'development:test'
-    disk: 1024
     mounts:
       "/tmp":
         source: local
@@ -37,7 +36,7 @@ applications:
 services:
   database:
     type: postgresql:15
-    disk: 2048
+
 
 routes:
   "https://{default}/":

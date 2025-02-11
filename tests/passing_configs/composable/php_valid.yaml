@@ -10,12 +10,12 @@ applications:
                     index:
                         - index.php
                     allow: true
-        disk: 512
+
 
 services:
     db:
         type: mariadb:10.11
-        disk: 1024
+
 
 routes:
     "https://{default}/":

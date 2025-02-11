@@ -10,7 +10,7 @@ applications:
       locations:
         "/":
           allow: true
-    disk: 512
+
 
 services:
   redis:

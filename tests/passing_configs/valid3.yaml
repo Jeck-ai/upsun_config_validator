@@ -26,8 +26,6 @@ applications:
 services:
   db:
     type: postgresql:15
-    configuration:
-      storage: "2GB"
   cache:
     type: redis:7.0
   varnish:

@@ -8,7 +8,6 @@ applications:
         web:
             commands:
                 start: npm run serve
-        disk: 512
     backend:
         type: nodejs:20
         hooks:
@@ -17,12 +16,10 @@ applications:
         web:
             commands:
                 start: npm run api
-        disk: 512
 
 services:
     db:
         type: mongodb:5.0
-        disk: 1024
     cache:
         type: redis:7.0
 

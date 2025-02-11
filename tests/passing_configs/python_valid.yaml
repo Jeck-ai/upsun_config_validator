@@ -13,8 +13,7 @@ applications:
 services:
   db:
     type: postgresql:13
-    configuration:
-      storage: 1GB
+
 
 routes:
   "https://{default}/":
