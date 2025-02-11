@@ -14,7 +14,7 @@ A Python-based validator for Upsun (formerly Platform.sh) configuration files. T
 
 ```bash
 # Clone the repository
-git clone git@github.com:robertDouglass/upsun_config_validator.git
+git clone git@github.com:Jeck-ai/upsun_config_validator.git
 
 # Create and activate virtual environment
 python -m venv venv
