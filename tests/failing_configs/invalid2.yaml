@@ -1,6 +1,6 @@
 applications:
   myapp:
-    type: "ruby@2.7.0"   # Invalid: "ruby" is not permitted by the regex.
+    type: "ruby@2.7.0"   # Invalid: uses @ instead of :
 services:
   database:
     type: "mariadb:10.5"
