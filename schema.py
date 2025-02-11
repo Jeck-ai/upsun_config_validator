@@ -82,17 +82,29 @@ UPSUN_SCHEMA = {
                                 "endpoint": {"type": "string"}
                             }
                         }
-                    }
-                },
-                "allOf": [
-                    {
-                        "not": {
-                            "properties": {
-                                "disk": {}
+                    },
+                    "variables": {
+                        "type": "object",
+                        "properties": {
+                            "env": {
+                                "type": "object",
+                                "additionalProperties": {"type": "string"}
                             }
                         }
+                    },
+                    "mounts": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "source": {"type": "string"},
+                                "source_path": {"type": "string"}
+                            },
+                            "required": ["source", "source_path"],
+                            "additionalProperties": False
+                        }
                     }
-                ],
+                },
                 "oneOf": [
                     {"required": ["type"]},
                     {"required": ["stack"]}
@@ -131,9 +143,6 @@ UPSUN_SCHEMA = {
                         ]
                     }
                 },
-                "not": {
-                    "required": ["disk"]
-                },
                 "required": ["type"],
                 "additionalProperties": False
             }
@@ -142,12 +151,17 @@ UPSUN_SCHEMA = {
             "type": "object",
             "minProperties": 1,
             "patternProperties": {
-                "^https?://({default}|[-a-zA-Z0-9]+\\.{default})(/.*)?$": {
+                "^https?://(\\*\\.)?([a-zA-Z0-9-]+\\.)?{default}(/.*)?$": {
                     "type": "object",
                     "properties": {
                         "type": {"type": "string", "enum": ["upstream", "redirect"]},
                         "upstream": {"type": "string"},
                         "to": {"type": "string"},
+                        "id": {"type": "string"},
+                        "attributes": {
+                            "type": "object",
+                            "additionalProperties": True
+                        },
                         "cache": {
                             "type": "object",
                             "properties": {

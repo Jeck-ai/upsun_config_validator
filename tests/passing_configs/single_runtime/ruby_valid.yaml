@@ -12,7 +12,7 @@ applications:
       commands:
         start: bundle exec puma -b unix://$SOCKET
       locations:
-        "/":
+        "":
           root: "public"
           passthru: true
           expires: 1h
@@ -23,13 +23,13 @@ applications:
         NODE_ENV: 'production'
         BUNDLE_WITHOUT: 'development:test'
     mounts:
-      "/tmp":
+      tmp:
         source: local
         source_path: tmp
-      "/log":
+      log:
         source: local
         source_path: log
-      "/storage":
+      storage:
         source: local
         source_path: storage
 
