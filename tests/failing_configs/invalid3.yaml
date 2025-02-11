@@ -5,6 +5,6 @@ services:
   database:
     type: "mariadb:10.5"
 routes:
-  "https://www.{default}/":   # Invalid: key must be exactly "http(s)://{default}/" (optionally without trailing slash)
+  "example.com/":   # Invalid: missing required http(s):// prefix
     type: redirect
     to: "https://{default}/"
