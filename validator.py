@@ -1,7 +1,7 @@
 import yaml
 import re
 from jsonschema import validate, ValidationError
-from schema import UPSUN_SCHEMA, ALLOWED_VERSIONS
+from schema import UPSUN_SCHEMA, validate_runtime_version
 
 def flatten_validation_error(error):
     error_path = " -> ".join(str(path) for path in error.path)
@@ -22,6 +22,14 @@ def validate_upsun_config(yaml_string):
         return ["YAML parsing error: Empty configuration"]
     
     try:
+        # Custom runtime version validation
+        if 'applications' in config:
+            for app_name, app_config in config['applications'].items():
+                if 'type' in app_config:
+                    is_valid, error_message = validate_runtime_version(app_config['type'])
+                    if not is_valid:
+                        return [f"Schema validation error for application '{app_name}': {error_message}"]
+        
         validate(instance=config, schema=UPSUN_SCHEMA)
         return ["No errors found. YAML is valid."]
     except ValidationError as e:

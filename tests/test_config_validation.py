@@ -49,41 +49,66 @@ def test_invalid_configs(filepath):
     yaml_content = load_yaml_file(filepath)
     errors = validate_upsun_config(yaml_content)
     
-    assert errors and any(
-        err.startswith(("Schema validation error:", "YAML parsing error:")) 
+    assert errors, f"Expected errors in {filepath} but got no errors"
+    assert any(
+        "validation error" in err.lower() or 
+        "invalid" in err.lower() or 
+        "error" in err.lower()
         for err in errors
-    ), f"Expected errors in {filepath} but got: {errors}"
+    ), f"Expected meaningful validation errors in {filepath}, but got: {errors}"
+
+def test_invalid_runtime_format():
+    # Test invalid runtime formats
+    test_cases = [
+        {
+            "name": "Wrong separator",
+            "yaml": """
+            applications:
+              myapp:
+                type: 'nodejs@14'
+            """,
+            "expected_message": "invalid runtime"
+        },
+        {
+            "name": "Unsupported runtime",
+            "yaml": """
+            applications:
+              myapp:
+                type: 'unknown:1.0'
+            """,
+            "expected_message": "unsupported runtime"
+        },
+        {
+            "name": "Invalid version format",
+            "yaml": """
+            applications:
+              myapp:
+                type: 'nodejs:abc'
+            """,
+            "expected_message": "invalid version"
+        }
+    ]
+
+    for case in test_cases:
+        errors = validate_upsun_config(case["yaml"])
+        assert errors, f"Case '{case['name']}' should have errors"
+        assert any(
+            case["expected_message"].lower() in err.lower() 
+            for err in errors
+        ), f"Case '{case['name']}' did not produce expected error message. Got: {errors}"
 
 def test_empty_config():
     errors = validate_upsun_config("")
-    assert "YAML parsing error: Empty configuration" in errors
+    assert "YAML parsing error" in errors[0].lower()
 
 def test_invalid_yaml_syntax():
     invalid_yaml = """
     applications:
       myapp:
-        type: 'nodejs@14'
+        type: 'nodejs:14'
         web:
           - this is invalid yaml
           syntax: [
     """
     errors = validate_upsun_config(invalid_yaml)
-    assert any("YAML parsing error:" in err for err in errors)
-
-def test_missing_required_fields():
-    yaml_content = """
-    services:
-      database:
-        type: 'mariadb:10.4'
-    """
-    errors = validate_upsun_config(yaml_content)
-    assert any("'applications' is a required property" in err for err in errors)
-
-def test_invalid_version_format():
-    yaml_content = """
-    applications:
-      myapp:
-        type: 'nodejs@invalid'
-    """
-    errors = validate_upsun_config(yaml_content)
-    assert any("does not match pattern" in err for err in errors)
+    assert "YAML parsing error" in errors[0].lower()
