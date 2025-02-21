@@ -1,19 +1,25 @@
 # schema.py
 import re
+import os
+import json
 
-ALLOWED_VERSIONS = {
-    "nodejs": ["22", "20", "18", "16"],
-    "php": ["8.4", "8.3", "8.2", "8.1"],
-    "python": ["3.12", "3.11", "3.10", "3.9", "3.8"],
-    "golang": ["1.23", "1.22", "1.21", "1.20", "1.19"],
-    "ruby": ["3.3", "3.2", "3.1", "3.0"],
-    "java": ["21", "19", "18", "17", "11", "8"],
-    "dotnet": ["8.0", "6.0", "7.0"],
-    "lisp": ["2.1", "2.0", "1.5"],
-    "elixir": ["1.15", "1.14"],
-    "rust": ["1"],
-    "bun": ["1.0"]
-}
+# @todo: periodically grab these versions from platformsh/platformsh-docs.
+registryLocation = "{0}/{1}".format(os.path.dirname(os.path.abspath(__file__)), "/data/registry.json")
+ALLOWED_VERSIONS = {}
+with open(registryLocation) as json_data:
+    data = json.load(json_data)
+    for key in data:
+        ALLOWED_VERSIONS[key] = {
+            "type": key,
+            "runtime": data[key]["runtime"],
+            "versions": data[key]["versions"]["supported"],
+        }
+        if "disk" in data[key]:
+            ALLOWED_VERSIONS[key]["disk"] = data[key]["disk"]
+        if "endpoint" in data[key]:
+            ALLOWED_VERSIONS[key]["endpoint"] = data[key]["endpoint"]
+        if "min_disk_size" in data[key]:
+            ALLOWED_VERSIONS[key]["min_disk_size"] = data[key]["min_disk_size"]
 
 def validate_runtime_version(runtime_type):
     """
@@ -37,7 +43,7 @@ def validate_runtime_version(runtime_type):
         return False, f"Unsupported runtime type '{runtime}'. Supported runtimes are: {', '.join(ALLOWED_VERSIONS.keys())}"
     
     # Check version format and allowed versions
-    valid_versions = ALLOWED_VERSIONS[runtime]
+    valid_versions = ALLOWED_VERSIONS[runtime]["versions"]
     
     # Support exact version match or x-based versions
     if version == 'x' or version.endswith('.x'):
