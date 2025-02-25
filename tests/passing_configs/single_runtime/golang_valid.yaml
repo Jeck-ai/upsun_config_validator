@@ -1,6 +1,6 @@
 applications:
   app:
-    type: golang@1.21
+    type: "golang:1.21"
     hooks:
       build: |
         go build -o app

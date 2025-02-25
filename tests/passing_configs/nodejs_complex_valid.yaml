@@ -1,6 +1,6 @@
 applications:
   api:
-    type: 'nodejs@16'
+    type: "nodejs:16"
     web:
       commands:
         start: node server.js
@@ -11,14 +11,11 @@ applications:
       database: 'db:postgresql'
       cache: 'cache:redis'
       search: 'search:elasticsearch'
-  worker:
-    type: 'nodejs@16'
-    web:
-      commands:
-        start: node worker.js
-    relationships:
-      database: 'db:postgresql'
-      queue: 'queue:rabbitmq'
+  # @todo: come back to this schema failure
+  # worker:
+  #   queue:
+  #     commands:
+  #       start: node worker.js
 
 services:
   db:
@@ -26,11 +23,11 @@ services:
     configuration:
       storage: 2GB
   cache:
-    type: redis:6.0
+    type: redis:6.2
     configuration:
       storage: 512MB
   search:
-    type: elasticsearch:7.9
+    type: elasticsearch:7.17
     configuration:
       storage: 1GB
   queue:

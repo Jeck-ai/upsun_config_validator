@@ -2,7 +2,7 @@
 # Valid YAML config without disk config
 applications:
   app:
-    type: nodejs@16
+    type: "node:16"
     web:
       commands:
         start: node index.js

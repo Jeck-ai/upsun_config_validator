@@ -1,6 +1,6 @@
 applications:
   app:
-    type: elixir@1.15
+    type: "elixir:1.15"
     hooks:
       build: |
         mix local.hex --force

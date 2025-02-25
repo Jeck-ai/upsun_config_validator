@@ -10,7 +10,6 @@ applications:
                     root: "priv/static"
                     allow: true
                     passthru: true
-        disk: 512
 
 services:
     db:

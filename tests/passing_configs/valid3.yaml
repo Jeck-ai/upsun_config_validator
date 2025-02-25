@@ -1,6 +1,6 @@
 applications:
   web:
-    type: nodejs@18
+    type: "nodejs:18"
     hooks:
       build: |
         npm install
@@ -18,10 +18,11 @@ applications:
         source: storage
         source_path: uploads
 
-  worker:
-    type: nodejs@18
-    commands:
-      start: npm run worker
+  # @todo: come back to this schema failure
+  # worker:
+  #   queue:
+  #     commands:
+  #       start: npm run worker
 
 services:
   db:

@@ -178,7 +178,7 @@ services:
     type: vault-kms:1.12 # All available versions are: 1.12
 
   rabbitmq:
-    type: rabbitmq:3.11 # All available versions are: 3.11, 3.10, 3.9
+    type: rabbitmq:3.12 # All available versions are: 3.11, 3.10, 3.9
 
   influxdb:
     type: influxdb:2.3 # All available versions are: 2.3

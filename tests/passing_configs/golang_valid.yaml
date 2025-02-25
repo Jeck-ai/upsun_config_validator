@@ -1,6 +1,6 @@
 applications:
   app:
-    type: 'golang@1.19'
+    type: 'golang:1.20'
     web:
       commands:
         start: ./app
@@ -14,7 +14,7 @@ applications:
 
 services:
   cache:
-    type: redis:6.0
+    type: redis:6.2
 
 routes:
   "https://{default}/":

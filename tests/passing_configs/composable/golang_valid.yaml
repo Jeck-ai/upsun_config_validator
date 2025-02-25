@@ -9,7 +9,6 @@ applications:
                 "/":
                     root: "public"
                     allow: true
-        disk: 512
 
 services:
     db:

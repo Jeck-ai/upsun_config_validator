@@ -1,6 +1,6 @@
 applications:
   app:
-    type: 'python@3.9'
+    type: "python:3.9"
     web:
       commands:
         start: python server.py

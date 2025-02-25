@@ -1,6 +1,6 @@
 applications:
   app:
-    type: 'php@8.2'
+    type: "php:8.2"
     web:
       locations:
         '/':

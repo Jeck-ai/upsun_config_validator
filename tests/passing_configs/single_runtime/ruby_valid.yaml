@@ -1,6 +1,6 @@
 applications:
   app:
-    type: ruby@3.3
+    type: "ruby:3.3"
     hooks:
       build: |
         mkdir -p "$PLATFORM_CACHE_DIR/bundle"

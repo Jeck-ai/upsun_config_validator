@@ -15,7 +15,7 @@ applications:
 
 services:
   cache:
-    type: redis:6.0
+    type: redis:6.2
 
 
 routes:

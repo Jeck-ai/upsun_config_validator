@@ -1,6 +1,6 @@
 applications:
     app:
-        type: java@17
+        type: "java:17"
         web:
             commands:
                 start: java -jar application.jar

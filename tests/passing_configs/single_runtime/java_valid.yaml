@@ -1,6 +1,6 @@
 applications:
   app:
-    type: java@21
+    type: "java:21"
     hooks:
       build: |
         ./mvnw package -DskipTests -Dquarkus.package.uber-jar=true

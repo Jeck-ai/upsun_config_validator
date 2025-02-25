@@ -1,6 +1,6 @@
 applications:
   frontend:
-    type: 'nodejs@16'
+    type: "nodejs:16"
     web:
       commands:
         start: npm start
@@ -11,7 +11,7 @@ applications:
           index:
             - index.html
   backend:
-    type: 'nodejs@16'
+    type: "nodejs:16"
     web:
       commands:
         start: node server.js

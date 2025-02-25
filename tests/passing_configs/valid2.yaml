@@ -1,7 +1,7 @@
 
 applications:
   frontend:
-    type: nodejs@16
+    type: "nodejs:16"
     web:
       commands: 
         start: npm start
@@ -10,7 +10,7 @@ applications:
           root: public
           index: ['index.html']
   backend: 
-    type: nodejs@16
+    type: "nodejs:16"
     web:
       commands:
         start: npm start

@@ -1,6 +1,6 @@
 applications:
   app:
-    type: elixir@1.15
+    type: "elixir:1.15"
     web:
       commands:
         start: mix phx.server

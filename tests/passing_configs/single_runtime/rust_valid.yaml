@@ -1,6 +1,6 @@
 applications:
     app:
-        type: rust:1.75
+        type: rust:1
         web:
             commands:
                 start: ./target/release/app

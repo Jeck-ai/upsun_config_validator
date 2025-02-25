@@ -12,7 +12,6 @@ applications:
                     index:
                         - index.html
                     allow: true
-        disk: 512
 
 services:
     db:

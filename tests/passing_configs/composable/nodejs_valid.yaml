@@ -19,7 +19,7 @@ applications:
 
 services:
     db:
-        type: mongodb:5.0
+        type: mongodb-enterprise:5.0
     cache:
         type: redis:7.0
 
