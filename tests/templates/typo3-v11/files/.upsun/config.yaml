@@ -1,0 +1,178 @@
+applications:
+    app:
+        # The runtime the application uses.
+        type: php:8.1
+        dependencies:
+            php:
+                composer/composer: '^2'
+        runtime:
+            # Enable the redis extension so TYPO3 can communicate with the Redis cache.
+            extensions:
+                - redis
+        # Composer build tasks run prior to build hook, which runs
+        # composer --no-ansi --no-interaction install --no-progress --prefer-dist --optimize-autoloader
+        # if composer.json is detected.
+        build:
+            flavor: composer
+        # The relationships of the application with services or other applications.
+        # The left-hand side is the name of the relationship as it will be exposed
+        # to the application in the PLATFORM_RELATIONSHIPS variable. The right-hand
+        # side is in the form `<service name>:<endpoint name>`.
+        #
+        # NOTE: Be sure to update database and Redis configuration in `public/typo3conf/PlatformshConfiguration.php`
+        # if you rename the relationships here.
+        relationships:
+            # MariaDB/MySQL will then be accessible to the app from 'database' relationship.
+            # The service name `db` must match the top-level attribute in `.platform/services.yaml`.
+            database: 'mdb:mysql'
+            # Redis will then be accessible to the app from 'rediscache' relationship.
+            # The service name `cache` must match the top-level attribute in `.platform/services.yaml`.
+            rediscache: 'cache:redis'
+        # The configuration of app when it is exposed to the web.
+        web:
+            # How the application container responds to incoming requests.
+            locations:
+                # All requests not otherwise specified follow these rules.
+                '/':
+                    # The folder from which to serve static assets, for this location.
+                    # This is a filesystem path, relative to the application root.
+                    root: 'public'
+                    # Redirect any incoming request to TYPO3's front controller.
+                    passthru: '/index.php'
+                    # File to consider first when serving requests for a directory.
+                    index:
+                        - 'index.php'
+                    # Deny access to all static files, except those specifically allowed below.
+                    allow: false
+                    # Rules for specific URI patterns.
+                    rules:
+                        # Allow access to common static files.
+                        '\.(jpe?g|png|gif|svgz?|css|js|map|ico|bmp|eot|woff2?|otf|ttf)$':
+                            allow: true
+                        '^/robots\.txt$':
+                            allow: true
+                        '^/sitemap\.xml$':
+                            allow: true
+                # Default Storage location where TYPO3 expects media resources to be located.
+                # Writable at runtime with the mount `public/fileadmin`.
+                '/fileadmin':
+                    root: 'public/fileadmin'
+                    # Do not execute PHP scripts from the writeable mount.
+                    scripts: false
+                    allow: true
+                    passthru: '/index.php'
+                    headers:
+                        Content-Security-Policy: "default-src 'self'; script-src 'none'; style-src 'none'; object-src 'none';"
+                # Directory for temporary files that should be publicly available (e.g. generated images).
+                # Writable at runtime with the mount `publi/typo3temp`.
+                '/typo3temp/assets':
+                    root: 'public/typo3temp/assets'
+                    # Do not execute PHP scripts from the writeable mount.
+                    scripts: false
+                    allow: true
+                    passthru: '/index.php'
+                # Local TYPO3 installation settings.
+                '/typo3conf/LocalConfiguration.php':
+                    allow: false
+                # Additional TYPO3 installation settings.
+                '/typo3conf/AdditionalConfiguration.php':
+                    allow: false
+                # @see https://docs.typo3.org/c/typo3/cms-core/master/en-us/Changelog/11.0/Breaking-93048-BackendURLRewrites.html
+                '/typo3/':
+                    root: 'public/typo3'
+                    passthru: '/typo3/index.php'
+                    allow: true
+                    scripts: true
+        # The 'mounts' describe writable, persistent filesystem mounts in the application.
+        mounts:
+            # Directory for temporary files. It contains subdirectories (see below) for
+            # temporary files of extensions and TYPO3 components.
+            "public/typo3temp":
+                source: storage
+                source_path: "typo3temp"
+            # Default Storage location where TYPO3 expects media resources to be located.
+            "public/fileadmin":
+                source: storage
+                source_path: "fileadmin"
+            # Contains system files, like caches, logs, sessions
+            "var":
+                source: storage
+                source_path: "var"
+            # Contains site configuration files, needs to be writable from the CMS and during deploy
+            "config":
+                source: storage
+                source_path: "config"
+        # The hooks that will be performed when the package is deployed.
+        hooks:
+            # The build hook runs after Composer to finish preparing up your code.
+            # No services are available but the disk is writeable.
+            build: |
+                # Exit hook immediately if a command exits with a non-zero status.
+                set -e
+
+                bash ./.platform-scripts/build.sh
+            # The deploy hook runs after your application has been deployed and started.
+            # Code cannot be modified at this point but the database is available.
+            # The site is not accepting requests while this script runs so keep it
+            # fast.
+            deploy: |
+                # Exit hook immediately if a command exits with a non-zero status.
+                set -e
+
+                bash ./.platform-scripts/deploy.sh
+        crons:
+            # Run TYPO3's Scheduler tasks every 5 minutes.
+            typo3:
+                spec: "*/5 * * * *"
+                cmd: "vendor/bin/typo3 scheduler:run"
+        variables:
+            env:
+                # After the initial installation you can remove (or comment out) this variable.
+                # @todo add link to docs
+                TYPO3_ENABLE_INSTALL_TOOL: 'true'
+        source:
+            root: /
+services:
+    # MariaDB/MySQL 10.4 service with 2048MB of allocated disk.
+    # The service name `db` is used in defining the `database` relationship in the
+    # `.platform.app.yaml` file.
+    # 
+    # See https://docs.platform.sh/configuration/services/mysql.html.
+    mdb:
+        type: mysql:10.4
+    # Redis 5.0 service definition. 
+    # The service name `cache` is used in defining the `rediscache` relationship in the
+    # `.platform.app.yaml` file.
+    # 
+    # See https://docs.platform.sh/configuration/services/redis.html.
+    cache:
+        type: redis:6.2
+routes:
+    # URL template for the main route, where `{default}` is replaced by
+    # the Platform.sh generated environment URL or the configured domain.
+    "https://{default}/":
+        # This route serves an application (upstream).
+        type: upstream
+        # Defines the upstream according to the form `<application-name>:http`,
+        # where the `name` attribute from `.platform.app.yaml` is used.
+        upstream: "app:http"
+        # Optional route identifier; constant across all environments. 
+        # 
+        # For TYPO3, the id "main" is used within `public/typo3conf/PlatformshConfig.php` 
+        # to set the `base` attribute for the site (in `config/sites/main/config.yaml`) from the 
+        # Platform.sh environment variable `PLATFORM_ROUTES`.
+        id: "main"
+        # HTTP cache configuration.
+        cache:
+            # Enabled (default `true`, but only if `cache` attribute is unspecified).
+            enabled: true
+            # List of allowed cookie names, all others are ignored. 
+            cookies:
+                # Used to identify a backend session when Backend User logged in.
+                - 'be_typo_user'
+                # Used to identify session ID when logged into TYPO3 Frontend.
+                - 'fe_typo_user'
+                # Default PHP session cookie.
+                - 'PHPSESSID'
+                # Validates sessions for System Maintenance Area.
+                - 'Typo3InstallTool'

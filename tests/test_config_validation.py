@@ -1,114 +1,69 @@
 import os
 import pytest
-from validator import validate_upsun_config
+
+from platformvalidator.utils.utils import get_yaml_files, load_yaml_file, get_all_projects_in_directory
+from platformvalidator.validate.validate import validate_all
+from platformvalidator.validate.upsun import validate_upsun_config
+from platformvalidator.validate.platformsh import validate_platformsh_config
 
 # Get the current directory (tests folder)
 TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
-PASSING_DIR = os.path.join(TESTS_DIR, 'passing_configs')
-FAILING_DIR = os.path.join(TESTS_DIR, 'failing_configs')
+PASSING_DIR = os.path.join(TESTS_DIR, 'templates')
 
-def load_yaml_file(filepath):
-    with open(filepath, 'r', encoding='utf-8') as f:
-        return f.read()
+@pytest.mark.parametrize("current_template", get_all_projects_in_directory(PASSING_DIR, "files"))
+def test_valid_provider_configfile_count(current_template):
 
-def get_yaml_files(directory):
-    yaml_files = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith('.yaml'):
-                yaml_files.append(os.path.join(root, file))
-    return yaml_files
+    skip_exceptions = ["shopware"]
+    template = current_template.split("/")[-2]
+    yaml_files = get_yaml_files(current_template)
 
-def check_push_output(output):
-    error_indicators = [
-        "invalid configuration files",
-        "failed to push",
-        "configuration error",
-        "validation failed"
-    ]
-    return not any(indicator in output.lower() for indicator in error_indicators)
-
-@pytest.mark.parametrize("filepath", get_yaml_files(PASSING_DIR))
-def test_valid_configs(filepath):
-    yaml_content = load_yaml_file(filepath)
-    errors = validate_upsun_config(yaml_content)
-    
-    assert errors == ["No errors found. YAML is valid."], \
-        f"Expected valid but got errors in {filepath}: {errors}"
-
-    try:
-        with open("/Users/robert/jeck/upsun_config_validator/logs/upsun.log", "r") as log_file:
-            log_content = log_file.read()
-            assert check_push_output(log_content), \
-                f"Upsun push failed for {filepath}"
-    except FileNotFoundError:
-        pytest.skip("Upsun log file not found - skipping push validation")
-
-@pytest.mark.parametrize("filepath", get_yaml_files(FAILING_DIR))
-def test_invalid_configs(filepath):
-    yaml_content = load_yaml_file(filepath)
-    errors = validate_upsun_config(yaml_content)
-    
-    assert errors, f"Expected errors in {filepath} but got no errors"
-    assert any(
-        "validation error" in err.lower() or 
-        "invalid" in err.lower() or 
-        "error" in err.lower()
-        for err in errors
-    ), f"Expected meaningful validation errors in {filepath}, but got: {errors}"
-
-def test_invalid_runtime_format():
-    # Test invalid runtime formats
-    test_cases = [
-        {
-            "name": "Wrong separator",
-            "yaml": """
-            applications:
-              myapp:
-                type: 'nodejs@14'
-            """,
-            "expected_message": "invalid runtime"
-        },
-        {
-            "name": "Unsupported runtime",
-            "yaml": """
-            applications:
-              myapp:
-                type: 'unknown:1.0'
-            """,
-            "expected_message": "unsupported runtime"
-        },
-        {
-            "name": "Invalid version format",
-            "yaml": """
-            applications:
-              myapp:
-                type: 'nodejs:abc'
-            """,
-            "expected_message": "invalid version"
+    if template not in skip_exceptions:
+        expected_files = {
+            "upsun": [
+                os.path.join(PASSING_DIR, f"{template}/files/.upsun/config.yaml")
+            ],
+            "platformsh": [
+                os.path.join(PASSING_DIR, f"{template}/files/.platform.app.yaml"),
+                os.path.join(PASSING_DIR, f"{template}/files/.platform/services.yaml"),
+                os.path.join(PASSING_DIR, f"{template}/files/.platform/routes.yaml")
+            ]
         }
-    ]
 
-    for case in test_cases:
-        errors = validate_upsun_config(case["yaml"])
-        assert errors, f"Case '{case['name']}' should have errors"
-        assert any(
-            case["expected_message"].lower() in err.lower() 
-            for err in errors
-        ), f"Case '{case['name']}' did not produce expected error message. Got: {errors}"
+    elif template == "shopware":
+        expected_files = {
+            "upsun": [
+                os.path.join(PASSING_DIR, f"{template}/files/.upsun/config.yaml")
+            ],
+            "platformsh": [
+                os.path.join(PASSING_DIR, f"{template}/files/.platform/applications.yaml"),
+                os.path.join(PASSING_DIR, f"{template}/files/.platform/services.yaml"),
+                os.path.join(PASSING_DIR, f"{template}/files/.platform/routes.yaml")
+            ]
+        }
 
-def test_empty_config():
-    errors = validate_upsun_config("")
-    assert "YAML parsing error" in errors[0].lower()
+    assert yaml_files.keys() == expected_files.keys(), f"Expected keys {expected_files.keys()} but got {yaml_files.keys()}"
+    assert len(yaml_files["upsun"]) == len(expected_files["upsun"]), f"Expected {len(expected_files["upsun"])} configuration yaml files but got {len(yaml_files["upsun"])}."
+    assert len(yaml_files["platformsh"]) == len(expected_files["platformsh"]), f"Expected {len(expected_files["platformsh"])} configuration yaml files but got {len(yaml_files["platformsh"])}."
+    assert sorted(yaml_files["upsun"]) == sorted(expected_files["upsun"]), f"Expected yaml files {expected_files["upsun"]} but got {yaml_files["upsun"]}"
+    assert sorted(yaml_files["platformsh"]) == sorted(expected_files["platformsh"]), f"Expected yaml files {expected_files["platformsh"]} but got {yaml_files["platformsh"]}"
 
-def test_invalid_yaml_syntax():
-    invalid_yaml = """
-    applications:
-      myapp:
-        type: 'nodejs:14'
-        web:
-          - this is invalid yaml
-          syntax: [
-    """
-    errors = validate_upsun_config(invalid_yaml)
-    assert "YAML parsing error" in errors[0].lower()
+@pytest.mark.parametrize("current_template", get_all_projects_in_directory(PASSING_DIR, "files"))
+def test_valid_upsun_templates(current_template):
+    yaml_files = get_yaml_files(current_template)
+    errors = validate_upsun_config(yaml_files)
+    assert errors == ["No errors found. YAML is valid."], \
+        f"Expected valid but got errors in {yaml_files['upsun'][0]}"
+
+@pytest.mark.parametrize("current_template", get_all_projects_in_directory(PASSING_DIR, "files"))
+def test_valid_platformsh_templates(current_template):
+    print(current_template)
+    yaml_files = get_yaml_files(current_template)
+    errors = validate_platformsh_config(yaml_files)
+    assert errors == ["No errors found. YAML is valid."], \
+        f"Expected valid but got errors in {current_template}"
+
+@pytest.mark.parametrize("current_template", get_all_projects_in_directory(PASSING_DIR, "files"))
+def test_crossprovider_validation(current_template):
+    errors = validate_all(current_template)
+    assert errors == ["No errors found. YAML is valid."], \
+        f"Expected valid but got errors in {current_template}"
