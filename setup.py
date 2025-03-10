@@ -43,16 +43,26 @@ setup(
     license='MIT',
     long_description=__readme__ + '\n\n' + __changelog__,
     long_description_content_type="text/markdown",
-    packages=find_packages(),
+    # packages=find_packages(),
     tests_require=['pytest'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.13'
+        'Programming Language :: Python :: 3'
     ],
     cmdclass={
         'verify': VerifyVersionCommand,
-    }
+    },
+    packages=[
+        'platformvalidator'
+    ],
+    include_package_data=True,
+    install_requires=[
+        'jsonschema',
+        'click',
+        'pyyaml'
+    ],
+    # entry_points={"console_scripts": ["realpython=reader.__main__:main"]}
 )

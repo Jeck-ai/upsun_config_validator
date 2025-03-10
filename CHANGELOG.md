@@ -19,9 +19,12 @@ At this point, this library does not yet handle:
 @todo
 
 - [ ] Finish packaging with Typer so single file/executable can be run via MCP
-- [ ] contributing examples instructions
-- [ ] issue and pull request templates
 - [ ] rename repo to match publish path
 - [ ] set pypi api token for publish action
-- [ ] setup recurring actions to pull upsun/p.sh schemas, extensions.yaml, and registry.json
 - [ ] Update readme
+- [ ] contributing examples instructions
+- [ ] issue and pull request templates
+
+Later: 
+
+- [ ] setup recurring actions to pull upsun/p.sh schemas, extensions.yaml, and registry.json

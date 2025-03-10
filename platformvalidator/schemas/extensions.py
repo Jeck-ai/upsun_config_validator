@@ -15,5 +15,9 @@ with open(phpExtensionsFile) as stream:
             },
             "extensions_by_version": data["grid"]
         }
+        for key in PHP_EXTENSIONS["valid"]:
+            for version in PHP_EXTENSIONS["extensions_by_version"]:
+                if key not in PHP_EXTENSIONS["extensions_by_version"][version]:
+                    PHP_EXTENSIONS["extensions_by_version"][version][key] = []
     except yaml.YAMLError as exc:
         print(exc)

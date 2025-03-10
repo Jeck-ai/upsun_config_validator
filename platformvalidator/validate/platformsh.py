@@ -13,16 +13,20 @@ def validate_platformsh_config(yaml_files):
     try:
         if "platformsh" in yaml_files:
 
-            configApp = None
+            # configApp = None
+            configAppFiles = []
             configRoutes = None
             configServices = None
+
+            print(yaml_files["platformsh"])
 
             for file in yaml_files["platformsh"]:
                 yaml_content = load_yaml_file(file)
                 data = yaml.safe_load(yaml_content)
                 if data is not None:
                     if ("name" in data) or ("applications" in data) or ((isinstance(data, list)) and ("name" in data[0])):
-                        configApp = data
+                        # configApp = data
+                        configAppFiles.append(data)
                     elif ("https://{default}/" in data) or ("https://{default}" in data):
                         configRoutes = data
                     else:
@@ -35,35 +39,61 @@ def validate_platformsh_config(yaml_files):
         return [f"YAML parsing error: {e}"]
     
     try:
-        if configApp is not None:
-            # Custom service version validation
-            if 'applications' in configApp:
-                for app_name, app_config in configApp['applications'].items():
-                    if 'type' in app_config:
-                        is_valid, error_message = validate_service_version(app_config['type'])
-                        if not is_valid:
-                            return [f"Schema validation error for application '{app_name}': {error_message}"]
-                        else:
-                            validate(instance=app_config, schema=PLATFORMSH_SCHEMA_APPS)
-                            return ["No errors found. YAML is valid."]
+        if configAppFiles:
+        # if configApp is not None:
+            for configApp in configAppFiles:
+                # Custom service version validation
+                if 'applications' in configApp:
+                    for app_name, app_config in configApp['applications'].items():
+                        if 'type' in app_config:
+                            is_valid, error_message = validate_service_version(app_config['type'])
+                            if not is_valid:
+                                return [f"Schema validation error for application '{app_name}': {error_message}"]
+                            else:
+                                validate(instance=app_config, schema=PLATFORMSH_SCHEMA_APPS)
 
-            elif 'type' in configApp:
-                is_valid, error_message = validate_service_version(configApp['type'])
-                if not is_valid:
-                    return ["Schema validation error for application: {0}".format(error_message)]
-                else:
-                    validate(instance=configApp, schema=PLATFORMSH_SCHEMA_APPS)
-                    return ["No errors found. YAML is valid."]
-                
-            elif isinstance(configApp, list):
-                for app_config in configApp:
-                    if 'type' in app_config:
-                        is_valid, error_message = validate_service_version(app_config['type'])
-                        if not is_valid:
-                            return [f"Schema validation error for application: {error_message}"]     
-                        else:
-                            validate(instance=app_config, schema=PLATFORMSH_SCHEMA_APPS)
-                            return ["No errors found. YAML is valid."]
+                            if "php" in app_config["type"]:
+                                php_version = app_config["type"].split(":")[1]
+                                if "runtime" in app_config:
+                                    if ( "extensions" in app_config["runtime"] ) or ( "disabled_extensions" in app_config["runtime"] ):
+                                        is_valid, error_message = validate_php_extensions(app_config["runtime"], php_version)
+                                        if not is_valid:
+                                            return [f"Schema validation error for application '{app_name}': {error_message}"]
+
+
+                elif 'type' in configApp:
+                    is_valid, error_message = validate_service_version(configApp['type'])
+                    if not is_valid:
+                        return ["Schema validation error for application: {0}".format(error_message)]
+                    else:
+                        validate(instance=configApp, schema=PLATFORMSH_SCHEMA_APPS)
+
+                    if "php" in configApp["type"]:
+                        php_version = configApp["type"].split(":")[1]
+                        if "runtime" in configApp:
+                            if ( "extensions" in configApp["runtime"] ) or ( "disabled_extensions" in configApp["runtime"] ):
+                                is_valid, error_message = validate_php_extensions(configApp["runtime"], php_version)
+                                if not is_valid:
+                                    app_name = configApp["name"]
+                                    return [f"Schema validation error for application '{app_name}': {error_message}"]
+                    
+                elif isinstance(configApp, list):
+                    for app_config in configApp:
+                        if 'type' in app_config:
+                            is_valid, error_message = validate_service_version(app_config['type'])
+                            if not is_valid:
+                                return [f"Schema validation error for application: {error_message}"]     
+                            else:
+                                validate(instance=app_config, schema=PLATFORMSH_SCHEMA_APPS)
+
+                            if "php" in app_config["type"]:
+                                php_version = app_config["type"].split(":")[1]
+                                if "runtime" in app_config:
+                                    if ( "extensions" in app_config["runtime"] ) or ( "disabled_extensions" in app_config["runtime"] ):
+                                        is_valid, error_message = validate_php_extensions(app_config["runtime"], php_version)
+                                        if not is_valid:
+                                            app_name = app_config["name"]
+                                            return [f"Schema validation error for application '{app_name}': {error_message}"]
 
         if configRoutes is not None:
             validate(instance=configRoutes, schema=PLATFORMSH_SCHEMA_ROUTES)

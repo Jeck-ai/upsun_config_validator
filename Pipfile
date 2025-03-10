@@ -10,6 +10,7 @@ platformvalidator = {editable = true,path = "."}
 pyyaml = "*"
 jsonschema = "*"
 pytest = "*"
+click = "*"
 
 [requires]
 python_version = "3.13"

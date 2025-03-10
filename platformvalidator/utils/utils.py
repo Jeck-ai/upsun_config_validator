@@ -1,4 +1,5 @@
 import os
+import glob
 
 def load_yaml_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
@@ -6,19 +7,17 @@ def load_yaml_file(filepath):
 
 def get_yaml_files(directory):
     yaml_files = {}
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith('.yaml'):
-                if "files/.upsun" in os.path.join(root, file):
-                    if "upsun" not in yaml_files:
-                        yaml_files["upsun"] = [os.path.join(root, file)]
-                    else: 
-                        yaml_files["upsun"].append(os.path.join(root, file))
-                if "files/.platform" in os.path.join(root, file):
-                    if "platformsh" not in yaml_files:
-                        yaml_files["platformsh"] = [os.path.join(root, file)]
-                    else: 
-                        yaml_files["platformsh"].append(os.path.join(root, file))
+    for file in glob.glob(f"{directory}/**/*.yaml", recursive=True, include_hidden=True):
+        if ".upsun" in file:
+            if "upsun" not in yaml_files:
+                yaml_files["upsun"] = [file]
+            else: 
+                yaml_files["upsun"].append(file)
+        if (".platform" in file) or (".platform.app.yaml" in file):
+            if "platformsh" not in yaml_files:
+                yaml_files["platformsh"] = [file]
+            else: 
+                yaml_files["platformsh"].append(file)
     return yaml_files
 
 def flatten_validation_error(error):
@@ -33,8 +32,7 @@ def flatten_validation_error(error):
 def get_all_projects_in_directory(directory, append_subdir):
     return [ f"{f.path}/{append_subdir}" for f in os.scandir(directory) if f.is_dir() ]
 
-    # projects = []
-    # for root, dirs, _ in os.walk(directory):
-    #     for d in dirs:
-    #         projects.append(os.path.join(root, d))
-    # return projects
+
+def make_bold_text(text):
+        bold = ["\033[1m", "\033[0m"]
+        return f"\n{bold[0]}{text}{bold[1]}\n"

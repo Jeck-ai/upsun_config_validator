@@ -1,0 +1,21 @@
+applications:
+    app:
+        type: php:8.1
+        # runtime:
+        #     # extensions:
+        #     #     - mysql
+        #     disabled_extensions:
+        #         - INVALID_EXTENSIONS
+        hooks:
+            build: |
+                npm install
+        web:
+            commands:
+                start: npm start
+
+        relationships:
+            db:
+
+services:
+    db:
+        type: postgresql:15

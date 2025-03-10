@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "845dee129c90f8ef78107e1604ae0ba6274dfe4b2b3d8d2a40f83e1a9cea16f4"
+            "sha256": "875d9ae34ce7b96143eee2658b9c271f8612202be077d609456e0d8b8640f5ac"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,6 +23,15 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==25.1.0"
+        },
+        "click": {
+            "hashes": [
+                "sha256:63c132bbbed01578a06712a2d1f497bb62d9c1c0d329b7903a866228027263b2",
+                "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==8.1.8"
         },
         "iniconfig": {
             "hashes": [
@@ -57,7 +66,7 @@
             "markers": "python_version >= '3.8'",
             "version": "==24.2"
         },
-        "platform-validator": {
+        "platformvalidator": {
             "editable": true,
             "path": "."
         },

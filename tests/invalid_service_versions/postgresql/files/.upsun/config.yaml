@@ -1,0 +1,21 @@
+applications:
+    app:
+        type: rust:1  # Invalid version number
+        web:
+            commands:
+                start: ./target/release/app
+            locations:
+                "/":
+                    root: "static"
+                    allow: true
+        # relationships:
+        #     db2:
+
+services:
+    db:
+        type: postgresql:155
+
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app"
