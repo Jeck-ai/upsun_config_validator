@@ -1,6 +1,6 @@
-from platformvalidator.utils.utils import get_yaml_files
-from platformvalidator.validate.upsun import validate_upsun_config
-from platformvalidator.validate.platformsh import validate_platformsh_config
+from upsunvalidator.utils.utils import get_yaml_files
+from upsunvalidator.validate.upsun import validate_upsun_config
+from upsunvalidator.validate.platformsh import validate_platformsh_config
 
 
 def validate_all(directory):

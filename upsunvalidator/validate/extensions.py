@@ -1,7 +1,7 @@
 import itertools
 import difflib
-from platformvalidator.schemas.extensions import PHP_EXTENSIONS
-# from platformvalidator.validate.errors import InvalidServiceVersionError, ValidationError, InvalidPHPExtensionError
+from upsunvalidator.schemas.extensions import PHP_EXTENSIONS
+# from upsunvalidator.validate.errors import InvalidServiceVersionError, ValidationError, InvalidPHPExtensionError
 
 def validate_php_extensions(runtime, php_version, app_name):
     # Get the keys straight.

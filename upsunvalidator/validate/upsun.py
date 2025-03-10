@@ -5,13 +5,13 @@ sys.tracebacklimit=0
 
 from jsonschema import validate
 
-from platformvalidator.schemas.upsun import UPSUN_SCHEMA
+from upsunvalidator.schemas.upsun import UPSUN_SCHEMA
 
-from platformvalidator.utils.utils import load_yaml_file, flatten_validation_error
-from platformvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
-from platformvalidator.validate.extensions import validate_php_extensions
+from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
+from upsunvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
+from upsunvalidator.validate.extensions import validate_php_extensions
 
-from platformvalidator.validate.errors import InvalidServiceVersionError, ValidationError, InvalidPHPExtensionError, InvalidServiceTypeError, InvalidServiceSchemaError, InvalidServiceVersionError
+from upsunvalidator.validate.errors import InvalidServiceVersionError, ValidationError, InvalidPHPExtensionError, InvalidServiceTypeError, InvalidServiceSchemaError, InvalidServiceVersionError
 
 
 def validate_upsun_config(yaml_files):

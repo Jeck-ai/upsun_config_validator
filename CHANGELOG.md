@@ -4,7 +4,7 @@
 
 ### Added
 
-For the first release of `platformvalidator`, this library contains the following capabilities:
+For the first release of `upsunvalidator`, this library contains the following capabilities:
 
 1. Leverages the pre-existing schema validation for Platform.sh and Upsun provided by the `app:config-validate` command.
 1. Validates valid service versions for both applications and services, as documented in the Platform.sh and Upsun public documentation.

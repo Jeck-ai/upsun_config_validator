@@ -35,7 +35,7 @@ class VerifyVersionCommand(install):
 
 setup(
     version=VERSION,
-    name='platformvalidator',
+    name='upsunvalidator',
     description='Helper library for validating configuration files against PaaS schemas.',
     url='https://github.com/Jeck-ai/upsun_config_validator',
     author='Jeck.ai',
@@ -56,7 +56,7 @@ setup(
         'verify': VerifyVersionCommand,
     },
     packages=[
-        'platformvalidator'
+        'upsunvalidator'
     ],
     include_package_data=True,
     install_requires=[

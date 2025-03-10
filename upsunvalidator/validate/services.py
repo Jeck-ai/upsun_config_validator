@@ -2,7 +2,7 @@ import re
 import difflib
 import random
 
-from platformvalidator.schemas.services import SERVICE_VERSIONS
+from upsunvalidator.schemas.services import SERVICE_VERSIONS
 
 #######################################################################################################################
 

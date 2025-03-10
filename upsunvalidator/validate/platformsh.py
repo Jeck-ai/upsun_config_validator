@@ -2,11 +2,11 @@ import yaml
 
 from jsonschema import validate, ValidationError
 
-from platformvalidator.schemas.platformsh import PLATFORMSH_SCHEMA_APPS, PLATFORMSH_SCHEMA_ROUTES, PLATFORMSH_SCHEMA_SERVICES
+from upsunvalidator.schemas.platformsh import PLATFORMSH_SCHEMA_APPS, PLATFORMSH_SCHEMA_ROUTES, PLATFORMSH_SCHEMA_SERVICES
 
-from platformvalidator.utils.utils import load_yaml_file, flatten_validation_error
-from platformvalidator.validate.services import validate_service_version
-from platformvalidator.validate.extensions import validate_php_extensions
+from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
+from upsunvalidator.validate.services import validate_service_version
+from upsunvalidator.validate.extensions import validate_php_extensions
 
 
 def validate_platformsh_config(yaml_files):

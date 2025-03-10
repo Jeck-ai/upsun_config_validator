@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "875d9ae34ce7b96143eee2658b9c271f8612202be077d609456e0d8b8640f5ac"
+            "sha256": "d7c8b09bb8acfbbaf029c1cecb9b5a9af1a407e3727069d9fc8d7f179765a396"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -65,10 +65,6 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==24.2"
-        },
-        "platformvalidator": {
-            "editable": true,
-            "path": "."
         },
         "pluggy": {
             "hashes": [
@@ -263,6 +259,10 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==0.23.1"
+        },
+        "upsunvalidator": {
+            "editable": true,
+            "path": "."
         }
     },
     "develop": {}

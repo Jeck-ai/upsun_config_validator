@@ -4,18 +4,18 @@ import itertools
 
 import pytest
 import unittest
-from platformvalidator.validate.errors import ValidationError, InvalidServiceVersionError, InvalidPHPExtensionError
+from upsunvalidator.validate.errors import ValidationError, InvalidServiceVersionError, InvalidPHPExtensionError
 
 # import sys
 # sys.tracebacklimit=0
 
-from platformvalidator.schemas.services import SERVICE_VERSIONS
-from platformvalidator.schemas.extensions import PHP_EXTENSIONS
+from upsunvalidator.schemas.services import SERVICE_VERSIONS
+from upsunvalidator.schemas.extensions import PHP_EXTENSIONS
 
-from platformvalidator.utils.utils import get_yaml_files, load_yaml_file, get_all_projects_in_directory
-from platformvalidator.validate.validate import validate_all
-from platformvalidator.validate.upsun import validate_upsun_config
-from platformvalidator.validate.platformsh import validate_platformsh_config
+from upsunvalidator.utils.utils import get_yaml_files, load_yaml_file, get_all_projects_in_directory
+from upsunvalidator.validate.validate import validate_all
+from upsunvalidator.validate.upsun import validate_upsun_config
+from upsunvalidator.validate.platformsh import validate_platformsh_config
 
 # Get the current directory (tests folder)
 TESTS_DIR = os.path.dirname(os.path.abspath(__file__))

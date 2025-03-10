@@ -1,12 +1,12 @@
 import click
 
-from platformvalidator.utils.utils import get_yaml_files
+from upsunvalidator.utils.utils import get_yaml_files
 
-from platformvalidator.validate.validate import validate_all 
-from platformvalidator.validate.platformsh import validate_platformsh_config
-from platformvalidator.validate.upsun import validate_upsun_config
+from upsunvalidator.validate.validate import validate_all 
+from upsunvalidator.validate.platformsh import validate_platformsh_config
+from upsunvalidator.validate.upsun import validate_upsun_config
 
-from platformvalidator.utils.utils import make_bold_text
+from upsunvalidator.utils.utils import make_bold_text
 
 @click.group()
 def cli():
@@ -55,14 +55,14 @@ if __name__ == '__main__':
 
 # Valid
 # @todo: there's no output right now.
-# pipenv run python -m platformvalidator validate --src tests/valid/shopware/files --provider upsun
+# pipenv run python -m upsunvalidator validate --src tests/valid/shopware/files --provider upsun
 
 # Invalid
-# pipenv run python -m platformvalidator validate --src tests/invalid_runtime_versions/nodejs/files --provider upsun
-# pipenv run python -m platformvalidator validate --src tests/invalid_service_versions/mariadb/files --provider upsun
-# pipenv run python -m platformvalidator validate --src tests/invalid_enable_php_extensions/invalid_enable/files --provider upsun
+# pipenv run python -m upsunvalidator validate --src tests/invalid_runtime_versions/nodejs/files --provider upsun
+# pipenv run python -m upsunvalidator validate --src tests/invalid_service_versions/mariadb/files --provider upsun
+# pipenv run python -m upsunvalidator validate --src tests/invalid_enable_php_extensions/invalid_enable/files --provider upsun
 
-# # pyinstaller --onefile --paths /Users/chadwcarlson/.local/share/virtualenvs/upsun_config_validator-xybjvp6i/lib/python3.13 platformvalidator/__main__.py -n upsunvalidator
+# # pyinstaller --onefile --paths /Users/chadwcarlson/.local/share/virtualenvs/upsun_config_validator-xybjvp6i/lib/python3.13 upsunvalidator/__main__.py -n upsunvalidator
 # % ./dist/upsunvalidator --src tests/invalid_service_versions/mariadb/files --provider upsun                                      
 # ModuleNotFoundError: No module named 'jsonschema'
 # [PYI-16617:ERROR] Failed to execute script '__main__' due to unhandled exception!
