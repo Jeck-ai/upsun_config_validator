@@ -1,0 +1,16 @@
+{
+    "channel": "24.11",
+    "runtimes": {
+        "sbcl": {},
+        "elixir": {},
+        "golang": {},
+        "java": {},
+        "bun": {},
+        "nodejs": {},
+        "perl": {},
+        "php": {},
+        "python": {},
+        "ruby": {}
+    }
+
+}

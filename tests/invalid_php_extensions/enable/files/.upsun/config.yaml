@@ -1,0 +1,59 @@
+applications:
+    app:
+        # The type of the application to build.
+        type: 'php:8.4'
+        # Indicate that we want to use composer2, (leave out if you want composer1)
+        dependencies:
+            php:
+                composer/composer: '^2'
+
+        runtime:
+            extensions:
+                - myql
+                - ctype
+                - dom
+                - iconv
+                - mbstring
+                - fileinfo
+                - intl
+                - redis
+                - sodium
+                - amqp
+
+        # The hooks that will be performed when the package is deployed.
+        hooks:
+            build: |
+                set -e
+            deploy: |
+                set -e
+        # The mounts that will be performed when the package is deployed.
+        mounts:
+            # Because this directory is in the webroot, files here will be web-accessible.
+            'web/uploads':
+                source: storage
+                source_path: uploads
+            # Files in this directory will not be web-accessible.
+            'private':
+                source: storage
+                source_path: private
+        # The configuration of app when it is exposed to the web.
+        web:
+            locations:
+                "/":
+                    # The public directory of the app, relative to its root.
+                    root: "web"
+                    # The front-controller script to send non-static requests to.
+                    passthru: "/index.php"
+        source:
+            operations:
+                auto-update:
+                    command: |
+                        curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+            root: /
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app:http"
+    "https://www.{default}/":
+        type: redirect
+        to: "https://{default}/"

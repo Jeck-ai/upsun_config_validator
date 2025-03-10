@@ -1,0 +1,88 @@
+applications:
+    app:
+        # The runtime the application uses.
+        type: nodejs:16
+        # The relationships of the application with services or other applications.
+        #
+        # The left-hand side is the name of the relationship as it will be exposed
+        # to the application in the PLATFORM_RELATIONSHIPS variable. The right-hand
+        # side is in the form `<service name>:<endpoint name>`.
+        relationships:
+            database: "dbpostgres:postgresql"
+            rediscache: "cacheredis:redis"
+            redisratelimit: "ratelimitredis:redis"
+        # The hooks that will be triggered when the package is deployed.
+        hooks:
+            build: |
+                set -e
+                # Copy committed extensions and uploads to tmp directories so not overwritten by mount.
+                if [ -d extensions ]; then
+                    mkdir extensions-tmp && mv extensions/* extensions-tmp
+                fi
+                if [ -d uploads ]; then
+                    mkdir uploads-tmp && mv uploads/* uploads-tmp
+                fi
+            deploy: |
+                set -e
+                # Installs the database and sets up the initial admin user. Only run on first deploy.
+                if [ ! -f var/platformsh.installed ]; then
+                    # Install the database
+                    echo 'Installing the database...'
+                    npx directus database install
+
+                    # Create the admin user role
+                    echo 'Setting up the initial admin role...'
+                    ROLE_UUID=$(npx directus roles create --name admin --admin)
+
+                    # Pipe output of above command into this one, adding an initial admin user
+                    echo 'Creating the initial admin user...'
+                    npx directus users create --email $INIT_ADMINUSER --password $INIT_ADMINPW --role $ROLE_UUID
+
+                    # Create file that indicates first deploy and installation has been completed.
+                    touch var/platformsh.installed
+                fi;
+                # Copy committed extensions and uploads back onto writable mounts.
+                if [ -d extensions-tmp ]
+                then
+                    cp -r extensions-tmp/* extensions
+                fi
+                if [ -d uploads-tmp ]
+                then
+                    cp -r uploads-tmp/* uploads
+                fi
+        # Start the Directus server. 
+        web:
+            commands:
+                start: npx directus start
+        # Platform.sh write access at runtime.
+        mounts:
+            'extensions':
+                source: storage
+                source_path: extensions
+            'uploads':
+                source: storage
+                source_path: uploads
+            'var':
+                source: storage
+                source_path: var
+        source:
+            operations:
+                auto-update:
+                    command: |
+                        curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+            root: /
+services:
+    dbpostgres:
+        type: postgresql:12
+    cacheredis:
+        type: redis:6.2
+
+    ratelimitredis:
+        type: redis:6.2
+routes:
+    "https://www.{default}/":
+        type: upstream
+        upstream: "app:http"
+    "https://{default}/":
+        type: redirect
+        to: "https://www.{default}/"

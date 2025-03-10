@@ -1,0 +1,120 @@
+applications:
+    app:
+        # The type of the application to build.
+        type: php:8.2
+        dependencies:
+            php:
+                composer/composer: '^2'
+        runtime:
+            extensions:
+                - redis
+        # - blackfire # https://docs.platform.sh/integrations/observability/blackfire.
+
+        build:
+            flavor: none
+        variables:
+            env:
+                N_PREFIX: /app/.global
+        # The hooks that will be performed when the package is deployed.
+        hooks:
+            build: |
+                set -e
+                composer --no-ansi --no-interaction install --no-progress --prefer-dist --optimize-autoloader --no-dev
+                # install a specific NodeJS version https://github.com/platformsh/snippets/
+                #   -v requested version
+                #   -y install Yarn
+                # curl -fsS https://raw.githubusercontent.com/platformsh/snippets/main/src/install_node.sh | { bash /dev/fd/3 -v 17.5 -y; } 3<&0
+
+                # uncomment next line to build assets deploying
+                # npm install && npm run production
+            deploy: |
+                set -e
+                php artisan optimize:clear
+
+                php artisan migrate --force
+        # The relationships of the application with services or other applications.
+        # The left-hand side is the name of the relationship as it will be exposed
+        # to the application in the PLATFORM_RELATIONSHIPS variable. The right-hand
+        # side is in the form `<service name>:<endpoint name>`.
+        relationships:
+            database: "db:mysql"
+            rediscache: "cache:redis"
+            redissession: "cache:redis"
+        # The mounts that will be performed when the package is deployed.
+        mounts:
+            "storage/app/public":
+                source: storage
+                source_path: "public"
+            "storage/framework/views":
+                source: storage
+                source_path: "views"
+            "storage/framework/sessions":
+                source: storage
+                source_path: "sessions"
+            "storage/framework/cache":
+                source: storage
+                source_path: "cache"
+            "storage/logs":
+                source: storage
+                source_path: "logs"
+            "bootstrap/cache":
+                source: storage
+                source_path: "cache"
+            "/.config":
+                source: storage
+                source_path: "config"
+        # The configuration of app when it is exposed to the web.
+        web:
+            locations:
+                "/":
+                    root: "public"
+                    index:
+                        - index.php
+                    allow: true
+                    passthru: "/index.php"
+                "/storage":
+                    root: "storage/app/public"
+                    scripts: false
+        crons:
+            # Run Laravel's scheduler every 5 minutes, which is often as crons can run on Professional plans.
+            scheduler:
+                spec: '*/5 * * * *'
+                commands: 
+                    start: 'php artisan schedule:run'
+            # Run Laravel's queue worker task every 9 minutes
+            queue:
+                spec: '*/9 * * * *'
+                # Allow the worker to run for up to 5 minutes. That prevents
+                # a long-running queue from blocking a deploy for more than 5
+                # minutes.
+                commands: 
+                    start: 'php artisan queue:work --max-time=300'
+        # If you have an especially large queue, you may be better off using a worker.
+        # If so, comment out the `queue` cron entry and uncomment this instead. Note that
+        # Doing so requires a Medium plan or larger.
+        #workers:
+        #    queue:
+        #        size: S
+        #        commands:
+        #            # To minimize leakage, the queue worker will stop every hour
+        #            # and get restarted automatically.
+        #            start: |
+        #                php artisan queue:work --max-time=3600
+        source:
+            operations:
+                auto-update:
+                    command: |
+                        curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+            root: /
+services:
+    db:
+        type: mariadb:10.4
+    cache:
+        type: redis:6.2
+routes:
+    "https://www.{default}/":
+        type: upstream
+        upstream: "app:http"
+    "https://{default}/":
+        type: redirect
+        to: "https://www.{default}/"

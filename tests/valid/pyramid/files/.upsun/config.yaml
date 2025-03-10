@@ -1,0 +1,42 @@
+applications:
+    app:
+        # The runtime the application uses.
+        type: "python:3.8"
+        # The build-time dependencies of the app.
+        dependencies:
+            python:
+                pipenv: "2018.10.13"
+        # The hooks executed at various points in the lifecycle of the application.
+        hooks:
+            build: |
+                pipenv install --system --deploy
+        # The relationships of the application with services or other applications.
+        #
+        # The left-hand side is the name of the relationship as it will be exposed
+        # to the application in the PLATFORM_RELATIONSHIPS variable. The right-hand
+        # side is in the form `<service name>:<endpoint name>`.
+        relationships:
+            database: "db:mysql"
+            redis: "cache:redis"
+        # The configuration of app when it is exposed to the web.
+        web:
+            commands:
+                start: python app.py
+        source:
+            operations:
+                auto-update:
+                    command: |
+                        curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+            root: /
+services:
+    db:
+        type: "mariadb:10.4"
+    cache:
+        type: "redis:6.2"
+routes:
+    "https://{default}/":
+        type: upstream
+        upstream: "app:http"
+    "https://www.{default}/":
+        type: redirect
+        to: "https://{default}/"

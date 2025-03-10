@@ -1,0 +1,3 @@
+db:
+    type: mariadb:100.55
+    disk: 256
