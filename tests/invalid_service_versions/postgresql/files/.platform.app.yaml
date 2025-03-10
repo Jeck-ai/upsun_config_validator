@@ -1,0 +1,9 @@
+name: app
+type: rust:1
+web:
+    commands:
+        start: ./target/release/app
+    locations:
+        "/":
+            root: "static"
+            allow: true

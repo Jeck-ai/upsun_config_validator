@@ -1,0 +1,2 @@
+db:
+    type: postgresql:155

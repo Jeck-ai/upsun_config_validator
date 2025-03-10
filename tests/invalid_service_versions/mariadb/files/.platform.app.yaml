@@ -1,0 +1,11 @@
+name: app
+type: php:8.1
+hooks:
+    build: |
+        npm install
+web:
+    commands:
+        start: npm start
+
+relationships:
+    db:

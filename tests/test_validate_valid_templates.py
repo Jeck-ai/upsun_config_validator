@@ -16,10 +16,10 @@ def test_valid_upsun_templates(current_template):
         assert errors == ["✔ No errors found. YAML is valid.\n"], \
             f"Expected valid but got errors in {yaml_files['upsun'][0]}"
 
-# @pytest.mark.parametrize("current_template", get_all_projects_in_directory(PASSING_DIR, "files"))
-# def test_valid_platformsh_templates(current_template):
-#     yaml_files = get_yaml_files(current_template)
-#     if "platformsh" in yaml_files:
-#         errors = validate_platformsh_config(yaml_files)
-#         assert errors == ["✔ No errors found. YAML is valid.\n"], \
-#             f"Expected valid but got errors in {yaml_files['upsun'][0]}"
+@pytest.mark.parametrize("current_template", get_all_projects_in_directory(PASSING_DIR, "files"))
+def test_valid_platformsh_templates(current_template):
+    yaml_files = get_yaml_files(current_template)
+    if "platformsh" in yaml_files:
+        errors = validate_platformsh_config(yaml_files)
+        assert errors == ["✔ No errors found. YAML is valid.\n"], \
+            f"Expected valid but got errors in {yaml_files['upsun'][0]}"
