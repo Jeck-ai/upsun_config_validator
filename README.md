@@ -16,18 +16,21 @@ A Python-based validator for Upsun (formerly Platform.sh) configuration files. T
 # Clone the repository
 git clone git@github.com:Jeck-ai/upsun_config_validator.git
 
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Install the validator
+cd upsun_config_validator
+pip install --editable .
 ```
 
 ## Usage
 
-To validate a config file:
+To validate a project:
 
+```bash
+# Run a validation
+upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider upsun
+upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider platformsh
+```
+<!-- 
 ```python
 from validator import validate_upsun_config
 
@@ -41,24 +44,25 @@ else:
     print("Validation errors found:")
     for error in errors:
         print(f"- {error}")
-```
+``` -->
 
 ## Testing
 
 The project includes a comprehensive test suite:
 
 ```bash
-pytest
+pipenv install
+pipenv run pytest
 ```
 
-Test files are organized in two directories:
+<!-- Test files are organized in two directories:
 - `tests/passing_configs/`: Examples of valid configurations
 - `tests/failing_configs/`: Examples of invalid configurations
 
 ## Documentation
 
 - `docs/routes.md`: Documentation of valid route patterns
-- More documentation coming soon
+- More documentation coming soon -->
 
 ## License
 
@@ -66,10 +70,11 @@ MIT
 
 ## Contributing
 
-We're very interested in adding to the passing configs. If you have working .upsun/config.yaml files, please share!
+We're very interested in adding to the passing configs. If you have working configuration files for Platform.sh and/or Upsun, please share!
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -am 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/files/...`
+4. Commit your changes (`git commit -am 'Add some amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
