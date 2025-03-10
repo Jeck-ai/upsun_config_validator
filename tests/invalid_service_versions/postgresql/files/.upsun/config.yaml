@@ -1,6 +1,6 @@
 applications:
     app:
-        type: rust:1  # Invalid version number
+        type: rust:1
         web:
             commands:
                 start: ./target/release/app
@@ -8,8 +8,6 @@ applications:
                 "/":
                     root: "static"
                     allow: true
-        # relationships:
-        #     db2:
 
 services:
     db:

@@ -1,11 +1,6 @@
 applications:
     app:
         type: php:8.1
-        # runtime:
-        #     # extensions:
-        #     #     - mysql
-        #     disabled_extensions:
-        #         - INVALID_EXTENSIONS
         hooks:
             build: |
                 npm install
@@ -18,4 +13,4 @@ applications:
 
 services:
     db:
-        type: postgresql:15
+        type: mariadb:100.55

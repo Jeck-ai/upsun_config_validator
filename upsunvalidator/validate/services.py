@@ -201,12 +201,12 @@ def validate_service_version(service_type, service_name, service_or_runtime):
         error_message = f"""
 
   Unsupported version '{version}' for {service_or_runtime} '{service}'. Supported versions are: \n\n    · {'\n    · '.join(valid_versions)}
-  
-✔ Recommendation: 
+
+✔ Recommendation:
 
   Update your configuration for the service '{service_name}' to use one of the supported versions listed above.
 
-  Example: 
+  Example:
 
     ```
     services:
@@ -218,12 +218,12 @@ def validate_service_version(service_type, service_name, service_or_runtime):
         error_message = f"""
 
   Unsupported version '{version}' for {service_or_runtime} '{service}'. Supported versions are: \n\n    · {'\n    · '.join(valid_versions)}
-  
-✔ Recommendation: 
+
+✔ Recommendation:
 
   Update your configuration for the runtime '{service_name}' to use one of the supported versions listed above.
 
-  Example: 
+  Example:
 
     ```
     applications:

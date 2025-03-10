@@ -44,7 +44,7 @@ def validate_upsun_config(yaml_files):
             del combined["services"]
 
     else:
-        return ["No Upsun configuration found.\n"]
+        return ["✔ No errors found. YAML is valid.\n"]
 
     config = combined
 
@@ -57,15 +57,15 @@ def validate_upsun_config(yaml_files):
                 # Validate the schema.
                 is_valid, error_message = validate_service_schema(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise InvalidServiceSchemaError(f"\n\n✘ Error found in application '{app_name}': {error_message}")
+                    raise InvalidServiceSchemaError(f"\n\n✘ Error found in application '{app_name}'{error_message}")
                 # Validate the type.
                 is_valid, error_message = validate_service_type(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise InvalidServiceTypeError(f"\n\n✘ Error found in application '{app_name}': {error_message}")
+                    raise InvalidServiceTypeError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
                 # Validate the service versions.
                 is_valid, error_message = validate_service_version(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise InvalidServiceVersionError(f"\n\n✘ Error found in application '{app_name}': {error_message}")
+                    raise InvalidServiceVersionError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
 
                 if "php" in app_config["type"]:
                     php_version = app_config["type"].split(":")[1]
@@ -73,7 +73,7 @@ def validate_upsun_config(yaml_files):
                         if ( "extensions" in app_config["runtime"] ) or ( "disabled_extensions" in app_config["runtime"] ):
                             is_valid, error_message = validate_php_extensions(app_config["runtime"], php_version, app_name)
                             if not is_valid:
-                                raise InvalidPHPExtensionError(f"\n\n✘ Error found in application '{app_name}': {error_message}")
+                                raise InvalidPHPExtensionError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
 
     if 'services' in config:
         for service_name, service_config in config['services'].items():
@@ -81,15 +81,15 @@ def validate_upsun_config(yaml_files):
                 # Validate the schema.
                 is_valid, error_message = validate_service_schema(service_config['type'], service_name, "service")
                 if not is_valid:
-                    raise InvalidServiceSchemaError(f"\n\n✘ Error found in application '{service_name}': {error_message}")
+                    raise InvalidServiceSchemaError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
                 # Validate the type.
                 is_valid, error_message = validate_service_type(service_config['type'], service_name, "service")
                 if not is_valid:
-                    raise InvalidServiceTypeError(f"\n\n✘ Error found in application '{service_name}': {error_message}")
+                    raise InvalidServiceTypeError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
                 # Validate the service versions.
                 is_valid, error_message = validate_service_version(service_config['type'], service_name, "service")
                 if not is_valid:
-                    raise InvalidServiceVersionError(f"\n\n✘ Error found in application '{service_name}': {error_message}")
+                    raise InvalidServiceVersionError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
 
     validate(instance=config, schema=UPSUN_SCHEMA)
 
