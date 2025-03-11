@@ -19,8 +19,8 @@
 <br />
 <a href="https://jeck.ai"><strong>Give us a try</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <a href="https://jeck.ai/blog"><strong>Blog</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-<a href="https://github.com/platformsh-templates/drupal11/issues/new?assignees=&labels=bug&template=bug_report.yml"><strong>Report a bug</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-<a href="https://github.com/platformsh-templates/drupal11/issues/new?assignees=&labels=feature+request&template=improvements.yml"><strong>Request a feature</strong></a>
+<a href="https://github.com/Jeck-ai/upsun_config_validator/issues/new?assignees=&labels=bug&template=bug-report.yml"><strong>Report a bug</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/issues/new?assignees=&labels=feature+request&template=improvements.yml"><strong>Request a feature</strong></a>
 <br /><br />
 </p>
 
@@ -40,10 +40,11 @@
 
 <p align="center">
 <br />
-<a href="#about"><strong>About</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-<a href="#getting-started"><strong>Getting started</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-<a href="#migrate"><strong>Migrate</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-<a href="#learn"><strong>Learn</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#features"><strong>Features</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#installation"><strong>Installation</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#usage"><strong>Usage</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#testing"><strong>Testing</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#license"><strong>License</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <a href="#contribute"><strong>Contribute</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <br />
 </p>
@@ -54,15 +55,20 @@ This tool helps catch configuration errors before deployment by validating confi
 
 ## Features
 
-- Validates application runtimes and their versions
-- Validates service configurations
+- Validates application runtimes, services, and their versions
+- Validates application and service configurations
 - Validates route patterns and configurations
 - Provides clear error messages for invalid configurations
+- Provides recommendations when possible
 - Includes test suite with passing and failing examples
 
 ## Installation
 
 ```bash
+python -m pip install --user upsunvalidator
+```
+
+<!-- ```bash
 # Clone the repository
 git clone git@github.com:Jeck-ai/upsun_config_validator.git
 
@@ -71,17 +77,53 @@ cd upsun_config_validator
 python3 -m venv venv
 source venv/bin/activate
 pip install .
-```
+``` -->
 
 ## Usage
 
-To validate a project:
+### Validating project code for various PaaS providers
 
-```bash
-# Run a validation
-upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider upsun
-upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider platformsh
-```
+1. Provider: Upsun
+
+    ```bash
+    # If executing from within the repository, pwd will be used.
+    upsunvalidator validate --provider upsun
+    # or
+    upv validate --provider upsun
+
+    # If outside the project dir, use the --src flag
+    upsunvalidator validate --src $PATH_TO_REPO --provider upsun
+    # or
+    upv validate --src $PATH_TO_REPO --provider upsun
+    ```
+
+2. Provider: Platform.sh
+
+    ```bash
+    # If executing from within the repository, pwd will be used.
+    upsunvalidator validate --provider platformsh
+    # or
+    upv validate --provider platformsh
+
+    # If outside the project dir, use the --src flag
+    upsunvalidator validate --src $PATH_TO_REPO --provider platformsh
+    # or
+    upv validate --src $PATH_TO_REPO --provider platformsh
+    ```
+
+3. All providers
+
+    ```bash
+    # If executing from within the repository, pwd will be used.
+    upsunvalidator validate
+    # or
+    upv validate
+
+    # If outside the project dir, use the --src flag
+    upsunvalidator validate --src $PATH_TO_REPO
+    # or
+    upv validate --src $PATH_TO_REPO
+    ```
 
 ## Testing
 
@@ -94,20 +136,11 @@ pip install .
 pytest
 ```
 
-<!-- Test files are organized in two directories:
-- `tests/passing_configs/`: Examples of valid configurations
-- `tests/failing_configs/`: Examples of invalid configurations
-
-## Documentation
-
-- `docs/routes.md`: Documentation of valid route patterns
-- More documentation coming soon -->
-
 ## License
 
-MIT
+[MIT License](./LICENSE)
 
-## Contributing
+## Contribe
 
 We're very interested in adding to the passing configs. If you have working configuration files for Platform.sh and/or Upsun, please share!
 
