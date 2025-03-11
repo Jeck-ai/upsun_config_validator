@@ -1,5 +1,7 @@
 import click
 
+import upsunvalidator
+
 from upsunvalidator.utils.utils import get_yaml_files
 
 from upsunvalidator.validate.validate import validate_all 
@@ -103,6 +105,12 @@ def cli():
     
     Tip: you can use this CLI directly (`upsunvalidator`) or through the alias (`uv`).
     """
+
+
+@cli.command 
+def version(**args):
+    """Retrieve the current version of this tool."""
+    print(upsunvalidator.__version__) 
 
 
 @cli.command()
