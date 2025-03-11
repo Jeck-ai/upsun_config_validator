@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.2] - 2025-03-XX
+
+### Additional post-release fixes
+
+Running PR for additional tweaks and fixes following the initial release:
+
+- Single installation path for now
+- Update upgrade instructions
+
 ## [0.1.1] - 2025-03-11
 
 ### Initial release follow-up
