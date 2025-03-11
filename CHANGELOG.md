@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2025-03-11
+
+### Initial release follow-up
+
+Small updates to issue templates and installation instructions post initial release.
+
 ## [0.1.0] - 2025-03-11
 
 ### Initial release

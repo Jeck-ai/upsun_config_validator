@@ -63,11 +63,14 @@ This tool helps catch configuration errors before deployment by validating confi
 
 ## Installation
 
-**Requirements**
+**Requirements:**
 
-- Python >= 3.12
+> [!IMPORTANT]  
+> `upsunvalidator` requires at least Python 3.12.
 
 ```bash
+pip install upsunvalidator
+# or
 python -m pip install --user upsunvalidator
 ```
 
@@ -82,17 +85,6 @@ upsunvalidator version
 ```bash
 python -m pip install --user upsunvalidator --upgrade
 ```
-
-<!-- ```bash
-# Clone the repository
-git clone git@github.com:Jeck-ai/upsun_config_validator.git
-
-# Install the validator
-cd upsun_config_validator
-python3 -m venv venv
-source venv/bin/activate
-pip install .
-``` -->
 
 ## Usage
 

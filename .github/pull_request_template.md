@@ -22,18 +22,18 @@ Closes #{ISSUE_NUMBER}
 
 Updates affect:
 
-<!-- - [ ] Workflows -->
-<!-- - [ ] Issue and pull request templates -->
-<!-- - [ ] Packaging, publishing, and releases -->
-<!-- - [ ] Tests -->
-<!-- - [ ] Examples (`tests/valid`) -->
-<!-- - [ ] Failing examples (`tests/invalid_*`) -->
-<!-- - [ ] Documentation & docstrings -->
-<!-- - [ ] Changelog -->
-<!-- - [ ] Schema updates & additions -->
-<!-- - [ ] Utility functions -->
-<!-- - [ ] Validation -->
-<!-- - [ ] Providers -->
+- [ ] Workflows
+- [ ] Issue and pull request templates
+- [ ] Packaging, publishing, and releases
+- [ ] Tests
+- [ ] Examples (`tests/valid`)
+- [ ] Failing examples (`tests/invalid_*`)
+- [ ] Documentation & docstrings
+- [ ] Changelog
+- [ ] Schema updates & additions
+- [ ] Utility functions
+- [ ] Validation
+- [ ] Providers
 
 <!-- Describe your updates below this line. Feel free to uncomment/select items in the list above as well. -->
 
