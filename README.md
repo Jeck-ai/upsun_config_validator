@@ -36,6 +36,11 @@
 </a>
 </p>
 
+<hr>
+
+A Python-based validator for Upsun (formerly Platform.sh) configuration files. 
+This tool helps catch configuration errors before deployment by validating configuration YAML files against the official Upsun & Platform.sh schemas.
+
 <p align="center">
 <br />
 <a href="#features"><strong>Features</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
@@ -46,10 +51,6 @@
 <a href="#contribute"><strong>Contribute</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <br />
 </p>
-<hr>
-
-A Python-based validator for Upsun (formerly Platform.sh) configuration files. 
-This tool helps catch configuration errors before deployment by validating configuration YAML files against the official Upsun & Platform.sh schemas.
 
 ## Features
 
