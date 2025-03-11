@@ -1,30 +1,28 @@
 # Changelog
 
-## [0.0.1] - 2025-03-05
+## [0.1.0] - 2025-03-11
 
-### Added
+### Initial release
 
-For the first release of `upsunvalidator`, this library contains the following capabilities:
+`0.1.0` is the initial release of `upsunvalidator`, an open-source project written in Python that adds additional validation capabilities to upstream Platform.sh and Upsun schemas.
+It allows you to validate configuration for those PaaS providers locally prior to push, covering cases not yet addressed by those upstream schemas that might otherwise create friction during onboarding and testing. 
+
+In this first release, `upsunvalidator` contains the following capabilities:
 
 1. Leverages the pre-existing schema validation for Platform.sh and Upsun provided by the `app:config-validate` command.
 1. Validates valid service versions for both applications and services, as documented in the Platform.sh and Upsun public documentation.
 1. Validates valid PHP extensions for PHP application types, as documented in the Platform.sh and Upsun public documentation.
+1. When service types, versions, and extensions are invalid, this tool will make a guess of the users intent, providing recommended changes.
 1. Leverages a collection of working Platform.sh and Upsun templates as a part of internal testing.
+1. Understands multi-app configurations (combined configuration within a single `.upsun/config.yaml` file, `.platform/applications.yaml` file, or multiple `.platform.app.yaml` files throughout the repo.)
+1. Understands configuration combination for Upsun (all files within `.upsun` are merged into a single configuration describing the environment).
 
 At this point, this library does not yet handle:
 
-1. Multi-app configurations.
-1. Nix-based composable images.
-
-@todo
-
-- [ ] Finish packaging with Typer so single file/executable can be run via MCP
-- [ ] rename repo to match publish path
-- [ ] set pypi api token for publish action
-- [ ] Update readme
-- [ ] contributing examples instructions
-- [ ] issue and pull request templates
-
-Later: 
-
-- [ ] setup recurring actions to pull upsun/p.sh schemas, extensions.yaml, and registry.json
+1. Nix-based composable images (the `stack` key).
+1. Testing valid (or invalid) examples against actual deployments to verify validation additions.
+1. Configuration generation (`generate` command).
+1. `source.root` and path execution within hooks. That is, validating that a called script is located at the expected dest and executable.
+1. Regular, scheduled updates of upstream schemas, registries, and extensions list.
+1. Undefined service-to-relationship matches.
+1. Undefined route-to-application matches.

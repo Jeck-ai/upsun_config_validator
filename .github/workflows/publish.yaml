@@ -1,0 +1,29 @@
+---
+name: Publish (pypi)
+on:
+    # Workflow will run when a release has been published for the package
+    release:
+        types:
+            - published
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+env:
+    PYTHON_VERSION: 3.13
+    # Flit.
+    FLIT_USERNAME: __token__
+    FLIT_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+
+jobs:
+    publish:
+        name: "Publish to PYPI using Flit"
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - name: Setup Python 3.13
+            uses: actions/setup-python@v5
+            with:
+                python-version: ${{ env.PYTHON_VERSION }}   
+          - run: pip install flit
+          - run: flit build
+          - run: flit publish

@@ -1,80 +1,170 @@
-# Upsun Config Validator
 
-A Python-based validator for Upsun (formerly Platform.sh) configuration files. This tool helps catch configuration errors before deployment by validating `.upsun/config.yaml` files against the official Upsun schema.
+<p align="center">
+<a href="https://jeck.ai">
+<img src="https://avatars.githubusercontent.com/u/198296402?s=200&v=4" width="150px">
+</a>
+</p>
+
+<!-- <p align="center">
+<a href="https://www.drupal.org/">
+<img src="header.svg">
+</a>
+</p> -->
+
+<h1 align="center">upsunvalidator</h1>
+
+<p align="center">
+<strong>Contribute, request a feature, or check out our resources</strong>
+<br />
+<br />
+<a href="https://jeck.ai"><strong>Check out Jeck.ai</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://jeck.ai/blog"><strong>Blog</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/issues/new?assignees=&labels=bug&template=bug-report.yml"><strong>Report a bug</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/issues/new?assignees=&labels=feature+request&template=improvements.yml"><strong>Request a feature</strong></a>
+<br /><br />
+</p>
+
+<p align="center">
+<a href="https://github.com/Jeck-ai/upsun_config_validator/issues">
+<img src="https://img.shields.io/github/issues/Jeck-ai/upsun_config_validator.svg?style=for-the-badge&labelColor=f4f2f3&color=3c724e&label=Issues" alt="Open issues" />
+</a>&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/pulls">
+<img src="https://img.shields.io/github/issues-pr/Jeck-ai/upsun_config_validator.svg?style=for-the-badge&labelColor=f4f2f3&color=3c724e&label=Pull%20requests" alt="Open PRs" />
+</a>&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/blob/master/LICENSE">
+<img src="https://img.shields.io/static/v1?label=License&message=MIT&style=for-the-badge&labelColor=f4f2f3&color=3c724e" alt="License" />
+</a>
+</p>
+
+<hr>
+
+A Python-based validator for Upsun (formerly Platform.sh) configuration files. 
+This tool helps catch configuration errors before deployment by validating configuration YAML files against the official Upsun & Platform.sh schemas.
+
+<p align="center">
+<br />
+<a href="#features"><strong>Features</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#installation"><strong>Installation</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#usage"><strong>Usage</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#testing"><strong>Testing</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#license"><strong>License</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#contribute"><strong>Contribute</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<br />
+</p>
 
 ## Features
 
-- Validates application runtimes and their versions
-- Validates service configurations
+- Validates application runtimes, services, and their versions
+- Validates application and service configurations
 - Validates route patterns and configurations
 - Provides clear error messages for invalid configurations
+- Provides recommendations when possible
 - Includes test suite with passing and failing examples
 
 ## Installation
 
+**Requirements**
+
+- Python >= 3.12
+
 ```bash
+python -m pip install --user upsunvalidator
+```
+
+You can then check the installed version with:
+
+```bash
+upsunvalidator version
+```
+
+### Upgrade
+
+```bash
+python -m pip install --user upsunvalidator --upgrade
+```
+
+<!-- ```bash
 # Clone the repository
 git clone git@github.com:Jeck-ai/upsun_config_validator.git
 
 # Install the validator
 cd upsun_config_validator
-pip install --editable .
-```
+python3 -m venv venv
+source venv/bin/activate
+pip install .
+``` -->
 
 ## Usage
 
-To validate a project:
+### Validating project code for various PaaS providers
 
-```bash
-# Run a validation
-upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider upsun
-upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider platformsh
-```
-<!-- 
-```python
-from validator import validate_upsun_config
+1. Provider: Upsun
 
-with open('path/to/.upsun/config.yaml', 'r') as f:
-    yaml_content = f.read()
-    
-errors = validate_upsun_config(yaml_content)
-if errors == ["No errors found. YAML is valid."]:
-    print("Configuration is valid!")
-else:
-    print("Validation errors found:")
-    for error in errors:
-        print(f"- {error}")
-``` -->
+    ```bash
+    # If executing from within the repository, pwd will be used.
+    upsunvalidator validate --provider upsun
+    # or
+    upv validate --provider upsun
+
+    # If outside the project dir, use the --src flag
+    upsunvalidator validate --src $PATH_TO_REPO --provider upsun
+    # or
+    upv validate --src $PATH_TO_REPO --provider upsun
+    ```
+
+2. Provider: Platform.sh
+
+    ```bash
+    # If executing from within the repository, pwd will be used.
+    upsunvalidator validate --provider platformsh
+    # or
+    upv validate --provider platformsh
+
+    # If outside the project dir, use the --src flag
+    upsunvalidator validate --src $PATH_TO_REPO --provider platformsh
+    # or
+    upv validate --src $PATH_TO_REPO --provider platformsh
+    ```
+
+3. All providers
+
+    ```bash
+    # If executing from within the repository, pwd will be used.
+    upsunvalidator validate
+    # or
+    upv validate
+
+    # If outside the project dir, use the --src flag
+    upsunvalidator validate --src $PATH_TO_REPO
+    # or
+    upv validate --src $PATH_TO_REPO
+    ```
 
 ## Testing
 
 The project includes a comprehensive test suite:
 
 ```bash
-pipenv install
-pipenv run pytest
+python3 -m venv venv
+source venv/bin/activate
+pip install .
+pytest
 ```
-
-<!-- Test files are organized in two directories:
-- `tests/passing_configs/`: Examples of valid configurations
-- `tests/failing_configs/`: Examples of invalid configurations
-
-## Documentation
-
-- `docs/routes.md`: Documentation of valid route patterns
-- More documentation coming soon -->
 
 ## License
 
-MIT
+[MIT License](./LICENSE)
 
-## Contributing
+## Contribute
 
 We're very interested in adding to the passing configs. If you have working configuration files for Platform.sh and/or Upsun, please share!
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/files/...`
-4. Commit your changes (`git commit -am 'Add some amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+1. Create an issue
+2. Fork the repository
+3. Create your feature branch (`git checkout -b feature/amazing-feature`)
+4. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/files/...`
+5. Commit your changes (`git commit -am 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for more details.

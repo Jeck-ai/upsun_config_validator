@@ -1,0 +1,82 @@
+name: Report a bug
+title: "[bug] "
+description: Report unexpected errors
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in helping improve the Upsun Validator project.
+        Please fill in the fields below so we can understand what changes are needed.
+
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Priority
+      description: |
+        What is the impact of this bug on the user, how critical is to fix? [Reference - Google Issue tracker priority levels](https://developers.google.com/issue-tracker/concepts/issues#priority)
+      default: 2
+      multiple: true
+      options:
+        - "P0: Issue needs to be addressed immediately, as it affects critical function and the most users. No known workarounds."
+        - "P1: Issue should be addressed quickly. Significant impact on large number of users. Workarounds are painful."
+        - "P2: Default priority. Issue should be addressed in reasonable amount of time. Workarounds exist without great impact to core, except perhaps first-time users."
+        - "P3: Address when able. Issue affects core functioning, but does not disrupt work."
+        - "P4: Address eventually. Issue does not affect core functioning. "
+    validations:
+      required: true
+
+  - type: dropdown
+    id: python
+    validations:
+      required: true
+    attributes:
+      label: Python version
+      multiple: true
+      description: What version of Python are you using?
+      options:
+        - "3.13"
+        - "3.12"
+        - "3.11"
+        - "3.10"
+
+  - type: dropdown
+    id: os
+    validations:
+      required: true
+    attributes:
+      label: Operating system
+      multiple: true
+      description: What operating system did you encounter the error on?
+      options:
+        - macOS
+        - Linux
+        - Windows
+
+  - type: textarea
+    attributes:
+      label: Screenshots/video
+      description: If applicable, add screenshots/video to help explain your problem.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+    validations:
+      required: false
