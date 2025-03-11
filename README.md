@@ -68,6 +68,18 @@ This tool helps catch configuration errors before deployment by validating confi
 python -m pip install --user upsunvalidator
 ```
 
+You can then check the installed version with:
+
+```bash
+upsunvalidator version
+```
+
+### Upgrade
+
+```bash
+python -m pip install --user upsunvalidator --upgrade
+```
+
 <!-- ```bash
 # Clone the repository
 git clone git@github.com:Jeck-ai/upsun_config_validator.git
