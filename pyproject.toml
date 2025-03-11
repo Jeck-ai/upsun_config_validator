@@ -19,7 +19,7 @@ dependencies = [
 
 [project.urls]
 Home = "https://jeck.ai"
-Source = "https://github.com/Jeck-ai/upsun_config_validator"
+Source = "https://github.com/Jeck-ai/upsunvalidator"
 
 [project.scripts]
 upv = "upsunvalidator.__main__:cli"
