@@ -1,5 +1,5 @@
 
-<p align="right">
+<p align="center">
 <a href="https://jeck.ai">
 <img src="https://avatars.githubusercontent.com/u/198296402?s=200&v=4" width="150px">
 </a>
@@ -17,7 +17,7 @@
 <strong>Contribute, request a feature, or check out our resources</strong>
 <br />
 <br />
-<a href="https://jeck.ai"><strong>Give us a try</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://jeck.ai"><strong>Check out Jeck.ai</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <a href="https://jeck.ai/blog"><strong>Blog</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <a href="https://github.com/Jeck-ai/upsun_config_validator/issues/new?assignees=&labels=bug&template=bug-report.yml"><strong>Report a bug</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 <a href="https://github.com/Jeck-ai/upsun_config_validator/issues/new?assignees=&labels=feature+request&template=improvements.yml"><strong>Request a feature</strong></a>
@@ -35,8 +35,6 @@
 <img src="https://img.shields.io/static/v1?label=License&message=MIT&style=for-the-badge&labelColor=f4f2f3&color=3c724e" alt="License" />
 </a>
 </p>
-
-<hr>
 
 <p align="center">
 <br />
@@ -63,6 +61,10 @@ This tool helps catch configuration errors before deployment by validating confi
 - Includes test suite with passing and failing examples
 
 ## Installation
+
+**Requirements**
+
+- Python >= 3.9
 
 ```bash
 python -m pip install --user upsunvalidator
