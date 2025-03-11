@@ -70,8 +70,6 @@ This tool helps catch configuration errors before deployment by validating confi
 
 ```bash
 pip install upsunvalidator
-# or
-python -m pip install --user upsunvalidator
 ```
 
 You can then check the installed version with:
@@ -83,7 +81,7 @@ upsunvalidator version
 ### Upgrade
 
 ```bash
-python -m pip install --user upsunvalidator --upgrade
+pip install --upgrade upsunvalidator
 ```
 
 ## Usage
