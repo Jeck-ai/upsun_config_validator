@@ -1,0 +1,30 @@
+name: Request features & improvments
+title: "[request] "
+description: Request features or suggest improvements to existing functionality.
+labels:
+  - feature-request
+  - enhancement
+  - needs/triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in helping improve the Upsun Validator project.
+        Please fill in the fields below so we can understand what you'd like to see changed.
+  - type: dropdown
+    attributes:
+      label: Type
+      description: What kind of change are your proposing?
+      multiple: false
+      options:
+        - "Feature request"
+        - "Improvement to existing function"
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Proposal
+      description: What would you like to see changed/added to Upsun Validator?
+    validations:
+      required: true

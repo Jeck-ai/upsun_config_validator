@@ -1,38 +1,29 @@
 ---
 name: Publish (pypi)
 on:
-    push: 
-      branches: 
-        - main
+    # Workflow will run when a release has been published for the package
+    release:
+        types:
+            - published
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+env:
+    PYTHON_VERSION: 3.13
+    # Flit.
+    FLIT_USERNAME: __token__
+    FLIT_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
 
 jobs:
-    deploy:
-        name: '[Build/publish] pypi'
+    publish:
+        name: "Publish to PYPI using Flit"
         runs-on: ubuntu-latest
         steps:
-        - uses: actions/checkout@v4
-        - name: Setup Python 3.13
-          uses: actions/setup-python@v5
-          with:
-              python-version: 3.13
-        - name: Prep package
-          run: python -m pip install --upgrade pipenv wheel
-        - run: pipenv install
-        - run: pipenv run "pytest"
-        - name: Get tag
-          id: getTag
-          run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-        - name: Create packages
-          run: pipenv run python setup.py sdist bdist_wheel
-        - name: Verify tag match
-          env:
-              GHACTION_TAG: ${{ steps.getTag.outputs.tag }}
-          if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-          run: pipenv run python setup.py verify
-        - name: Publish to pypi
-          if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-          uses: pypa/gh-action-pypi-publish@v1.4.1
-          with:
-              user: __token__
-              password: ${{ secrets.PYPI_API_TOKEN }}
-        
+          - uses: actions/checkout@v4
+          - name: Setup Python 3.13
+            uses: actions/setup-python@v5
+            with:
+                python-version: ${{ env.PYTHON_VERSION }}   
+          - run: pip install flit
+          - run: flit build
+          - run: flit publish

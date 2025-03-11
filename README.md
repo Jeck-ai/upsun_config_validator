@@ -1,6 +1,56 @@
-# Upsun Config Validator
 
-A Python-based validator for Upsun (formerly Platform.sh) configuration files. This tool helps catch configuration errors before deployment by validating `.upsun/config.yaml` files against the official Upsun schema.
+<p align="right">
+<a href="https://jeck.ai">
+<img src="https://avatars.githubusercontent.com/u/198296402?s=200&v=4" width="150px">
+</a>
+</p>
+
+<!-- <p align="center">
+<a href="https://www.drupal.org/">
+<img src="header.svg">
+</a>
+</p> -->
+
+<h1 align="center">upsunvalidator</h1>
+
+<p align="center">
+<strong>Contribute, request a feature, or check out our resources</strong>
+<br />
+<br />
+<a href="https://jeck.ai"><strong>Give us a try</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://jeck.ai/blog"><strong>Blog</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://github.com/platformsh-templates/drupal11/issues/new?assignees=&labels=bug&template=bug_report.yml"><strong>Report a bug</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="https://github.com/platformsh-templates/drupal11/issues/new?assignees=&labels=feature+request&template=improvements.yml"><strong>Request a feature</strong></a>
+<br /><br />
+</p>
+
+<p align="center">
+<a href="https://github.com/Jeck-ai/upsun_config_validator/issues">
+<img src="https://img.shields.io/github/issues/Jeck-ai/upsun_config_validator.svg?style=for-the-badge&labelColor=f4f2f3&color=3c724e&label=Issues" alt="Open issues" />
+</a>&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/pulls">
+<img src="https://img.shields.io/github/issues-pr/Jeck-ai/upsun_config_validator.svg?style=for-the-badge&labelColor=f4f2f3&color=3c724e&label=Pull%20requests" alt="Open PRs" />
+</a>&nbsp&nbsp
+<a href="https://github.com/Jeck-ai/upsun_config_validator/blob/master/LICENSE">
+<img src="https://img.shields.io/static/v1?label=License&message=MIT&style=for-the-badge&labelColor=f4f2f3&color=3c724e" alt="License" />
+</a>
+</p>
+
+<hr>
+
+<p align="center">
+<br />
+<a href="#about"><strong>About</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#getting-started"><strong>Getting started</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#migrate"><strong>Migrate</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#learn"><strong>Learn</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<a href="#contribute"><strong>Contribute</strong></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+<br />
+</p>
+<hr>
+
+A Python-based validator for Upsun (formerly Platform.sh) configuration files. 
+This tool helps catch configuration errors before deployment by validating configuration YAML files against the official Upsun & Platform.sh schemas.
 
 ## Features
 
@@ -32,21 +82,6 @@ To validate a project:
 upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider upsun
 upsunvalidator validate --src $PATH_TO_CONFIG_FILES --provider platformsh
 ```
-<!-- 
-```python
-from validator import validate_upsun_config
-
-with open('path/to/.upsun/config.yaml', 'r') as f:
-    yaml_content = f.read()
-    
-errors = validate_upsun_config(yaml_content)
-if errors == ["No errors found. YAML is valid."]:
-    print("Configuration is valid!")
-else:
-    print("Validation errors found:")
-    for error in errors:
-        print(f"- {error}")
-``` -->
 
 ## Testing
 
