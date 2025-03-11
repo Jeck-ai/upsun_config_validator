@@ -18,7 +18,9 @@ git clone git@github.com:Jeck-ai/upsun_config_validator.git
 
 # Install the validator
 cd upsun_config_validator
-pip install --editable .
+python3 -m venv venv
+source venv/bin/activate
+pip install .
 ```
 
 ## Usage
@@ -51,8 +53,10 @@ else:
 The project includes a comprehensive test suite:
 
 ```bash
-pipenv install
-pipenv run pytest
+python3 -m venv venv
+source venv/bin/activate
+pip install .
+pytest
 ```
 
 <!-- Test files are organized in two directories:

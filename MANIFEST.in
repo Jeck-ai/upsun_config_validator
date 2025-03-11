@@ -1,6 +1,0 @@
-# Include the license file
-include LICENSE
-# Include the changelog file
-include CHANGELOG.md
-# Include test data
-include tests/templates/*

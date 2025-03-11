@@ -1,3 +1,4 @@
+import os
 import click
 
 import upsunvalidator
@@ -103,7 +104,9 @@ def read_config(ctx, param, value):
 def cli():
     """Helper library for producing and ensuring valid Upsun & Platform.sh PaaS configuration against their schemas.
     
-    Tip: you can use this CLI directly (`upsunvalidator`) or through the alias (`uv`).
+    Tip: 
+    
+    You can use this CLI directly or through the alias (`upv`).
     """
 
 
@@ -115,45 +118,75 @@ def version(**args):
 
 @cli.command()
 @click.option("--src", help="Repository location you'd like to validate.", type=str)
-@click.option("--provider", help="PaaS provider you'd like to validate against.", type=str)
+@click.option("--provider", default="all", help="PaaS provider you'd like to validate against. (all, upsun, platformsh)", type=str)
 def validate(src, provider):
     """Validate a project's configuration files against PaaS schemas.
     
     Example:
 
-    upsunvalidator validate --src $(pwd) --provider upsun
+        upsunvalidator validate --src $(pwd) --provider upsun
+
+        upsunvalidator validate --src $(pwd) --provider platformsh
     
     or 
 
-    uv validate --src $(pwd) --provider upsun
+        upv validate --src $(pwd) --provider upsun
+
+        upv validate --src $(pwd) --provider platformsh
+
+    You can run against all providers if `--provider` is not passed
+
+        upv validate --src $(pwd)
+
+        upsunvalidator validate --src $(pwd)
+
+    Alias: val
     """
+
+    if not src:
+        src = os.getcwd()
+
     yaml_files = get_yaml_files(src)
 
-    if provider == "all":
-        validate_all(src)
-    
     valid_providers = [
         "upsun", 
         "platformsh"
     ]
-
-    if provider in valid_providers:
-        if provider == "upsun":
+    
+    if provider == "all":
+        print(make_bold_text("Validating for all providers..."))
+        if yaml_files:
+            print(make_bold_text("1. Validating for Upsun..."))
+            results = validate_upsun_config(yaml_files)
+            print(results[0])
+            print(make_bold_text("2. Validating for Platform.sh..."))
+            results = validate_platformsh_config(yaml_files)
+            print(results[0])
+        else:
+            print("✘ No YAML files found. Exiting.\n")
+    elif provider in valid_providers:
+        if provider == "upsun" and "upsun" in yaml_files:
             print(make_bold_text("Validating for Upsun..."))
             results = validate_upsun_config(yaml_files)
-        elif provider == "platformsh":
-            print("\nValidating for Platform.sh...\n")
+            print(results[0])
+        elif provider == "platformsh" and "platformsh" in yaml_files:
+            print(make_bold_text("Validating for Platform.sh..."))
             results = validate_platformsh_config(yaml_files)
-    else:
-        results = ["Choose a valid provider: upsun, platformsh"]
+            print(results[0])
+        elif not yaml_files:
+            print("✘ No YAML files found. Exiting.\n")
+    elif provider != "all":
+        results = ["✘ Choose a valid provider: upsun, platformsh"]
 
-    print(results[0])
+        print(results[0])
 
 @cli.command 
 def generate(**args):
     """Generate configuration files for a given PaaS.
     
     This command is currently being developed.
+
+    Alias: gen
     """
     print("Coming soon...") 
 

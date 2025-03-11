@@ -1,8 +1,15 @@
+[build-system]
+requires = ["flit_core >=3.11,<4"]
+build-backend = "flit_core.buildapi"
+
 [project]
 name = "upsunvalidator"
-version = "0.1.0"
-description = "Helper library for validating configuration files against PaaS schemas."
+authors = [{name = "Jeck.ai", email = "rob@jeck.ai"}]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
+dynamic = ["version", "description"]
 dependencies = [
     "click",
     "pyyaml",
@@ -10,13 +17,10 @@ dependencies = [
     "pytest"
 ]
 
+[project.urls]
+Home = "https://jeck.ai"
+Source = "https://github.com/Jeck-ai/upsun_config_validator"
+
 [project.scripts]
-uv = "upsunvalidator.__main__:cli"
+upv = "upsunvalidator.__main__:cli"
 upsunvalidator = "upsunvalidator.__main__:cli"
-
-[build-system]
-requires = ["flit_core<4"]
-build-backend = "flit_core.buildapi"
-
-[tool.flit.module]
-name = "upsunvalidator"
