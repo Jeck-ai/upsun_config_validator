@@ -64,7 +64,7 @@ This tool helps catch configuration errors before deployment by validating confi
 
 **Requirements**
 
-- Python >= 3.9
+- Python >= 3.12
 
 ```bash
 python -m pip install --user upsunvalidator
