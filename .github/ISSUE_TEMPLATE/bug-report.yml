@@ -2,7 +2,7 @@ name: Report a bug
 title: "[bug] "
 description: Report unexpected errors
 labels:
-  - bug-report
+  - bug
 body:
   - type: markdown
     attributes:

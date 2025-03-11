@@ -154,13 +154,16 @@ pytest
 
 [MIT License](./LICENSE)
 
-## Contribe
+## Contribute
 
 We're very interested in adding to the passing configs. If you have working configuration files for Platform.sh and/or Upsun, please share!
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/files/...`
-4. Commit your changes (`git commit -am 'Add some amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+1. Create an issue
+2. Fork the repository
+3. Create your feature branch (`git checkout -b feature/amazing-feature`)
+4. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/files/...`
+5. Commit your changes (`git commit -am 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for more details.
