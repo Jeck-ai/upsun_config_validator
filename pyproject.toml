@@ -4,14 +4,13 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "upsunvalidator"
-authors = [{name = "Jeck.ai", email = "rob@jeck.ai"}]
+authors = [{name = "Jeck.ai", email = "robert@jeck.ai"}]
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dynamic = ["version", "description"]
 dependencies = [
-    "click",
     "pyyaml",
     "jsonschema",
     "pytest"
@@ -20,7 +19,3 @@ dependencies = [
 [project.urls]
 Home = "https://jeck.ai"
 Source = "https://github.com/Jeck-ai/upsunvalidator"
-
-[project.scripts]
-upv = "upsunvalidator.__main__:cli"
-upsunvalidator = "upsunvalidator.__main__:cli"

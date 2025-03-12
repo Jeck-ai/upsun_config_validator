@@ -11,13 +11,40 @@ from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
 from upsunvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
 from upsunvalidator.validate.extensions import validate_php_extensions
 
-from upsunvalidator.validate.errors import InvalidServiceVersionError, ValidationError, InvalidPHPExtensionError, InvalidServiceTypeError, InvalidServiceSchemaError, InvalidServiceVersionError
+from jsonschema import ValidationError
 
+def validate_upsun_config_string(config_yaml_content):
+    """Validate a string containing Upsun configuration in YAML format.
+    
+    Args:
+        config_yaml_content (str): String containing the YAML configuration
+        
+    Returns:
+        list: List of validation results or error messages
+        
+    Raises:
+        yaml.YAMLError: If YAML parsing fails
+        ValidationError: If validation fails
+    """
+    # Parse the YAML content
+    config = yaml.safe_load(config_yaml_content)
+    
+    if config is None:
+        raise ValidationError("YAML parsing error: Empty configuration")
+    
+    # Validate the parsed configuration
+    return _validate_config(config)
 
 def validate_upsun_config(yaml_files):
-
+    """Validate Upsun configuration files.
+    
+    Args:
+        yaml_files (dict): Dictionary of file paths
+        
+    Returns:
+        list: List of validation results or error messages
+    """
     if "upsun" in yaml_files:
-
         # Combine all files in this directory (Relevant for Upsun only)
         combined = {
             "applications": {},
@@ -43,29 +70,140 @@ def validate_upsun_config(yaml_files):
         if combined["services"] == {}:
             del combined["services"]
 
+        return _validate_config(combined)
     else:
         return ["✔ No errors found. YAML is valid.\n"]
 
-    config = combined
 
-    if config is None:
-        return ["YAML parsing error: Empty configuration"]
+def _check_data_types(config):
+    """
+    Verify data types match expected schema types before validation
+    
+    Args:
+        config (dict): Parsed YAML configuration
+        
+    Raises:
+        ValidationError: If data types don't match expected schema types
+    """
+    if not isinstance(config, dict):
+        raise ValidationError("Configuration must be a dictionary/object")
+    
+    # Check root level properties
+    if 'applications' in config:
+        if not isinstance(config['applications'], dict):
+            raise ValidationError("'applications' must be an object/dictionary")
+            
+    if 'services' in config:
+        if not isinstance(config['services'], dict):
+            raise ValidationError("'services' must be an object/dictionary")
+            
+    if 'routes' in config:
+        if not isinstance(config['routes'], dict):
+            raise ValidationError("'routes' must be an object/dictionary")
+    
+    # Check applications section more deeply
+    if 'applications' in config and isinstance(config['applications'], dict):
+        for app_name, app_config in config['applications'].items():
+            if not isinstance(app_config, dict):
+                raise ValidationError(f"Application '{app_name}' must be an object/dictionary")
+            
+            # Check critical application properties
+            if 'type' in app_config and not isinstance(app_config['type'], str):
+                raise ValidationError(f"Application '{app_name}' type must be a string")
+                
+            if 'resources' in app_config and app_config['resources'] is not None:
+                if not isinstance(app_config['resources'], dict):
+                    raise ValidationError(f"Application '{app_name}' resources must be an object/dictionary")
+                
+                if 'base_memory' in app_config['resources'] and not isinstance(app_config['resources']['base_memory'], int):
+                    raise ValidationError(f"Application '{app_name}' base_memory must be an integer")
+    
+    # Check services section more deeply
+    if 'services' in config and isinstance(config['services'], dict):
+        for service_name, service_config in config['services'].items():
+            if not isinstance(service_config, dict):
+                raise ValidationError(f"Service '{service_name}' must be an object/dictionary")
+            
+            # Check critical service properties
+            if 'type' in service_config and not isinstance(service_config['type'], str):
+                raise ValidationError(f"Service '{service_name}' type must be a string")
 
+def _validate_config(config):
+    """
+    Internal function to validate the Upsun config structure
+    
+    Args:
+        config (dict): Parsed YAML configuration
+        
+    Returns:
+        list: List of validation results or error messages
+    """
+    # First check for required fields
+    if 'applications' not in config:
+        raise ValidationError("Missing required property: 'applications'")
+    
+    # Check for invalid top-level properties
+    invalid_props = []
+    for prop in config:
+        if prop not in ["applications", "services", "routes"]:
+            invalid_props.append(prop)
+    
+    if invalid_props:
+        props_list = ", ".join(f"'{prop}'" for prop in invalid_props)
+        raise ValidationError(f"Additional properties are not allowed: {props_list}")
+    
+    # Validate data types before schema validation
+    _check_data_types(config)
+    
+    # Validate against schema to catch structural issues early
+    try:
+        validate(instance=config, schema=UPSUN_SCHEMA)
+    except ValidationError as e:
+        # Enhance the error message to make it more clear
+        error_message = str(e)
+        
+        # Make additionalProperties errors more explicit
+        if "additionalProperties" in error_message:
+            raise ValidationError(f"Schema validation error: Additional properties not allowed - {error_message}")
+            
+        # Enhance type errors to make them more obvious
+        if "is not of type" in error_message:
+            raise ValidationError(f"Schema validation error: Type mismatch - {error_message}")
+            
+        # Enhance required field errors
+        if "required property" in error_message:
+            raise ValidationError(f"Schema validation error: Missing required field - {error_message}")
+            
+        # Pass through other validation errors
+        raise e
+    
+    # Now perform detailed validations for specific components
     if 'applications' in config:
         for app_name, app_config in config['applications'].items():
+            # Check required fields for applications
+            if not isinstance(app_config, dict):
+                raise ValidationError(f"Application '{app_name}' must be an object/dictionary")
+                
+            # Each application must have either type or stack
+            if 'type' not in app_config and 'stack' not in app_config:
+                raise ValidationError(f"Application '{app_name}' is missing required property: either 'type' or 'stack'")
+            
             if 'type' in app_config:
+                if not isinstance(app_config['type'], str):
+                    raise ValidationError(f"Application '{app_name}' type must be a string")
+                    
                 # Validate the 'type' schema.
                 is_valid, error_message = validate_service_schema(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise InvalidServiceSchemaError(f"\n\n✘ Error found in application '{app_name}'{error_message}")
+                    raise ValidationError(f"\n\n✘ Error found in application '{app_name}'{error_message}")
                 # Validate the type.
                 is_valid, error_message = validate_service_type(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise InvalidServiceTypeError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
+                    raise ValidationError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
                 # Validate the runtime versions.
                 is_valid, error_message = validate_service_version(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise InvalidServiceVersionError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
+                    raise ValidationError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
                 # Validate PHP extensions if defined.
                 if "php" in app_config["type"]:
                     php_version = app_config["type"].split(":")[1]
@@ -73,24 +211,32 @@ def validate_upsun_config(yaml_files):
                         if ( "extensions" in app_config["runtime"] ) or ( "disabled_extensions" in app_config["runtime"] ):
                             is_valid, error_message = validate_php_extensions(app_config["runtime"], php_version, app_name)
                             if not is_valid:
-                                raise InvalidPHPExtensionError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
+                                raise ValidationError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
 
     if 'services' in config:
         for service_name, service_config in config['services'].items():
+            # Check required fields for services
+            if not isinstance(service_config, dict):
+                raise ValidationError(f"Service '{service_name}' must be an object/dictionary")
+                
+            if 'type' not in service_config:
+                raise ValidationError(f"Service '{service_name}' is missing required property: 'type'")
+                
             if 'type' in service_config:
+                if not isinstance(service_config['type'], str):
+                    raise ValidationError(f"Service '{service_name}' type must be a string")
+                    
                 # Validate the schema.
                 is_valid, error_message = validate_service_schema(service_config['type'], service_name, "service")
                 if not is_valid:
-                    raise InvalidServiceSchemaError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
+                    raise ValidationError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
                 # Validate the type.
                 is_valid, error_message = validate_service_type(service_config['type'], service_name, "service")
                 if not is_valid:
-                    raise InvalidServiceTypeError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
+                    raise ValidationError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
                 # Validate the service versions.
                 is_valid, error_message = validate_service_version(service_config['type'], service_name, "service")
                 if not is_valid:
-                    raise InvalidServiceVersionError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
-
-    validate(instance=config, schema=UPSUN_SCHEMA)
+                    raise ValidationError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
 
     return ["✔ No errors found. YAML is valid.\n"]

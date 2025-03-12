@@ -1444,5 +1444,6 @@
   },
   "required": [
     "applications"
-  ]
+  ],
+  "additionalProperties": false
 }
