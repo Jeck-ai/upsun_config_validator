@@ -1,0 +1,20 @@
+applications:
+    app:
+        type: nodejs:22
+        hooks:
+            build: |
+                npm install
+        web:
+            commands:
+                start: npm start
+
+        relationships:
+            db:
+
+services:
+    db:
+        type: mariadb:10.4
+
+services:
+    db:
+        type: redis:6.2

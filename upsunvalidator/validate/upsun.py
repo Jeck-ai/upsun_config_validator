@@ -1,7 +1,9 @@
 import yaml
+import ruamel.yaml
+from ruamel.yaml.constructor import DuplicateKeyError
 
-import sys
-sys.tracebacklimit=0
+# import sys
+# sys.tracebacklimit=0
 
 from jsonschema import validate
 
@@ -15,9 +17,7 @@ from upsunvalidator.validate.errors import InvalidServiceVersionError, Validatio
 
 
 def validate_upsun_config(yaml_files):
-
     if "upsun" in yaml_files:
-
         # Combine all files in this directory (Relevant for Upsun only)
         combined = {
             "applications": {},
@@ -30,7 +30,33 @@ def validate_upsun_config(yaml_files):
                 data = yaml.safe_load(load_yaml_file(file))
             except yaml.YAMLError as e:
                 return [f"YAML parsing error: {e}"]
-                        
+
+            # Use ruamel to raise an error iff a duplicate top-level key is included in the same file/string.
+            rYAML = ruamel.yaml.YAML()
+            rYAML.allow_duplicate_keys = False
+            with open(file, "r") as f:
+                rData = rYAML.load(f)
+            if not rData:
+                raise DuplicateKeyError
+
+            # Ensure no invalid top-level keys are included in any configuration file.
+            invalid_keys = [key for key in data if key not in list(combined.keys())]
+            if invalid_keys:
+                is_are = "is"
+                key_keys = "a valid top-level key"
+                if len(invalid_keys) > 1:
+                    is_are = "are"
+                    key_keys = "valid top-level keys"     
+                error_message = f"""
+✘ Error found in configuration file {file}.
+
+  '{"', '".join(invalid_keys)}' {is_are} not {key_keys}.
+
+  Supported top-level keys are: {', '.join(list(combined.keys()))}
+
+"""
+                raise ValidationError(f"\n{error_message}")
+
             if "applications" in data:
                 combined["applications"] = combined["applications"] | data["applications"]
             if "services" in data:
