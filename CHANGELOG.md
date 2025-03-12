@@ -7,7 +7,7 @@
 Running PR for additional tweaks and fixes following the initial release:
 
 - Single installation path for now
-- Update upgrade instructions
+- [Update upgrade instructions](https://github.com/Jeck-ai/upsunvalidator/issues/13)
 
 ## [0.1.1] - 2025-03-11
 
