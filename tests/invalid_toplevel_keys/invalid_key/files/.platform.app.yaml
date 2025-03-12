@@ -1,0 +1,11 @@
+name: app
+type: nodejs:22
+hooks:
+    build: |
+        npm install
+web:
+    commands:
+        start: npm start
+
+relationships:
+    db:

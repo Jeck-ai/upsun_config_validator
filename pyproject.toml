@@ -13,7 +13,8 @@ dynamic = ["version", "description"]
 dependencies = [
     "pyyaml",
     "jsonschema",
-    "pytest"
+    "pytest",
+    "ruamel.yaml"
 ]
 
 [project.urls]

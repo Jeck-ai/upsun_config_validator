@@ -68,8 +68,14 @@ This library enforces strict schema validation to catch configuration errors bef
 
 ```bash
 pip install upsunvalidator
-# or
-python -m pip install --user upsunvalidator
+```
+
+You can then check the installed version with:
+
+### Upgrade
+
+```bash
+pip install --upgrade upsunvalidator
 ```
 
 ## Usage
@@ -168,6 +174,7 @@ The project includes a comprehensive test suite:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install .
 pytest
 ```

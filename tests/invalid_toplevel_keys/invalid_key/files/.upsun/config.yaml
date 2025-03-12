@@ -1,0 +1,22 @@
+applications:
+    app:
+        type: nodejs:22
+        hooks:
+            build: |
+                npm install
+        web:
+            commands:
+                start: npm start
+
+        relationships:
+            db:
+
+services:
+    db:
+        type: mariadb:10.4
+
+another_random_key:
+    name: foo_bar
+
+another_another_random_key:
+    name: foo_bar
