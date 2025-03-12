@@ -1,6 +1,7 @@
 import yaml
-import ruamel.yaml
-from ruamel.yaml.constructor import DuplicateKeyError
+
+# import ruamel.yaml
+# from ruamel.yaml.constructor import DuplicateKeyError
 
 # import sys
 # sys.tracebacklimit=0
@@ -61,12 +62,12 @@ def validate_upsun_config(yaml_files):
                 return [f"YAML parsing error: {e}"]
 
             # Use ruamel to raise an error iff a duplicate top-level key is included in the same file/string.
-            rYAML = ruamel.yaml.YAML()
-            rYAML.allow_duplicate_keys = False
-            with open(file, "r") as f:
-                rData = rYAML.load(f)
-            if not rData:
-                raise DuplicateKeyError
+            # rYAML = ruamel.yaml.YAML()
+            # rYAML.allow_duplicate_keys = False
+            # with open(file, "r") as f:
+            #     rData = rYAML.load(f)
+            # if not rData:
+            #     raise DuplicateKeyError
 
             # Ensure no invalid top-level keys are included in any configuration file.
             invalid_keys = [key for key in data if key not in list(combined.keys())]

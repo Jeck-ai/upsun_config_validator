@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.0] - 2025-03-12
+
+Library was restructured to prioritize string-based validation prompts for the MCP use case.
+
 ## [0.1.2] - 2025-03-12
 
 ### Additional post-release fixes
