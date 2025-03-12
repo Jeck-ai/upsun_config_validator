@@ -1,0 +1,98 @@
+applications:
+  gatsby:
+    hooks:
+      post_deploy: 'npm run build
+
+        '
+    mounts:
+      /.cache:
+        source: storage
+        source_path: cache
+      /.config:
+        source: storage
+        source_path: config
+      public:
+        source: storage
+        source_path: public
+    relationships:
+      wordpress: wordpress:http
+    services:
+      db:
+        type: mariadb:10.4
+    source:
+      root: /gatsby/
+    type: nodejs:16
+    variables:
+      env:
+        NODE_OPTIONS: --max_old_space_size=1536
+    web:
+      locations:
+        /:
+          allow: true
+          index:
+          - index.html
+          root: public
+          scripts: false
+  wordpress:
+    build:
+      flavor: composer
+    dependencies:
+      php:
+        composer/composer: ^2
+        wp-cli/wp-cli-bundle: ^2.4.0
+    mounts:
+      wordpress/wp-content/cache:
+        source: storage
+        source_path: cache
+      wordpress/wp-content/uploads:
+        source: storage
+        source_path: uploads
+    relationships:
+      database: db:mysql
+    source:
+      root: /wordpress/
+    type: php:8.1
+    web:
+      locations:
+        /:
+          allow: true
+          expires: 600
+          index:
+          - index.php
+          passthru: /index.php
+          root: wordpress
+          rules:
+            ^/composer\.json:
+              allow: false
+            ^/license\.txt$:
+              allow: false
+            ^/readme\.html$:
+              allow: false
+          scripts: true
+        /wp-content/cache:
+          allow: false
+          root: wordpress/wp-content/cache
+          scripts: false
+        /wp-content/uploads:
+          allow: true
+          root: wordpress/wp-content/uploads
+          scripts: false
+routes:
+  https://backend.{default}/:
+    cache:
+      cookies:
+      - /^wordpress_logged_in_/
+      - /^wordpress_sec_/
+      - wordpress_test_cookie
+      - /^wp-settings-/
+      - /^wp-postpass/
+      - /^wp-resetpass-/
+      enabled: true
+    type: upstream
+    upstream: wordpress:http
+  https://www.{default}/:
+    type: upstream
+    upstream: gatsby:http
+  https://{default}/:
+    to: https://www.{default}/
+    type: redirect

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+applications:
+  app:
+    hooks:
+      build: "set -e\n# Copy committed extensions and uploads to tmp directories so\
+        \ not overwritten by mount.\nif [ -d extensions ]; then\n    mkdir extensions-tmp\
+        \ && mv extensions/* extensions-tmp\nfi\nif [ -d uploads ]; then\n    mkdir\
+        \ uploads-tmp && mv uploads/* uploads-tmp\nfi\n"
+      deploy: "set -e\n# Installs the database and sets up the initial admin user.\
+        \ Only run on first deploy.\nif [ ! -f var/platformsh.installed ]; then\n\
+        \    # Install the database\n    echo 'Installing the database...'\n    npx\
+        \ directus database install\n\n    # Create the admin user role\n    echo\
+        \ 'Setting up the initial admin role...'\n    ROLE_UUID=$(npx directus roles\
+        \ create --name admin --admin)\n\n    # Pipe output of above command into\
+        \ this one, adding an initial admin user\n    echo 'Creating the initial admin\
+        \ user...'\n    npx directus users create --email $INIT_ADMINUSER --password\
+        \ $INIT_ADMINPW --role $ROLE_UUID\n\n    # Create file that indicates first\
+        \ deploy and installation has been completed.\n    touch var/platformsh.installed\n\
+        fi;\n# Copy committed extensions and uploads back onto writable mounts.\n\
+        if [ -d extensions-tmp ]\nthen\n    cp -r extensions-tmp/* extensions\nfi\n\
+        if [ -d uploads-tmp ]\nthen\n    cp -r uploads-tmp/* uploads\nfi\n"
+    mounts:
+      extensions:
+        source: storage
+        source_path: extensions
+      uploads:
+        source: storage
+        source_path: uploads
+      var:
+        source: storage
+        source_path: var
+    relationships:
+      database: dbpostgres:postgresql
+      rediscache: cacheredis:redis
+      redisratelimit: ratelimitredis:redis
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      commands:
+        start: npx directus start
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+routes:
+  https://www.{default}/: app:http
+  https://{default}/:
+    to: https://www.{default}/
+    type: redirect
+services:
+  cacheredis:
+    type: redis:6.2
+  dbpostgres:
+    type: postgresql:12
+  ratelimitredis:
+    type: redis:6.2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform

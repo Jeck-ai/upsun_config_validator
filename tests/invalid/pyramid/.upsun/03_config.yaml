@@ -1,0 +1,38 @@
+applications:
+  app:
+    dependencies:
+      python:
+        pipenv: 2018.10.13
+    hooks:
+      build: 'pipenv install --system --deploy
+
+        '
+    relationships:
+      database: db:mysql
+      redis: cache:redis
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type:
+      language: python:3.8
+      version: '1.0'
+    web:
+      commands:
+        start: python app.py
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  cache:
+    type: redis:6.2
+  db:
+    type: mariadb:10.4

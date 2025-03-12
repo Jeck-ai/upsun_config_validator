@@ -1,3 +1,0 @@
-deployment:
-    cache:
-        always_clear: true

@@ -1,3 +1,0 @@
-db:
-    type: mysql:10.3
-    disk: 2048

@@ -1,0 +1,38 @@
+applications:
+  app:
+    build:
+      flavor: none
+    dependencies:
+      nodejs:
+        yarn: 1.22.5
+    hooks:
+      build: 'yarn
+
+        yarn build
+
+        '
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      locations:
+        /:
+          allow: true
+          index:
+          - index.html
+          root: public
+          scripts: false
+routes:
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+variables:
+  env:
+    APP_ENV: prod
+    DEBUG: false

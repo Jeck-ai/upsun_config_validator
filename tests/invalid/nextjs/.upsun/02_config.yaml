@@ -1,0 +1,59 @@
+applications:
+  app:
+    build:
+      flavor: none
+    dependencies:
+      nodejs:
+        yarn: ^1.22.0
+    hooks:
+      build: 'yarn
+
+        yarn build
+
+        # Move committed files in soon-to-be mounts into temp directory.
+
+        chmod +x handle_mounts.sh
+
+        ./handle_mounts.sh
+
+        '
+      deploy: '# Move committed files from temp directory back into mounts.
+
+        ./handle_mounts.sh
+
+        '
+    mounts:
+      /.next/cache:
+        source: storage
+        source_path: next-cache
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      commands:
+        start: node server.js
+disk: 2048
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://www.{default}/:
+    type: upstream
+    upstream: app:http
+  https://{default}/:
+    to: https://www.{default}/
+    type: redirect
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

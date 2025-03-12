@@ -1,0 +1,49 @@
+applications:
+  app:
+    dependencies:
+      python:
+        pipenv: 2018.10.13
+    disk: 3.14159
+    hooks:
+      build: 'pipenv install --system --deploy
+
+        '
+    relationships:
+      database: db:mysql
+      redis: cache:redis
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: python:3.8
+    web:
+      commands:
+        start: python app.py
+      memory_limit: 2.71828
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  cache:
+    type: redis:6.2
+  db:
+    type: mariadb:10.4
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

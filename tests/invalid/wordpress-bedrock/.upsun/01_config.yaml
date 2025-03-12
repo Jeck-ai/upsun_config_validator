@@ -1,0 +1,84 @@
+applications:
+  app:
+    build:
+      flavor: composer
+    dependencies:
+      php:
+        composer/composer: ^2
+        wp-cli/wp-cli-bundle: ^2.4.0
+    mounts:
+      web/app/uploads:
+        source: storage
+        source_path: uploads
+      web/app/wp-content/cache:
+        source: storage
+        source_path: cache
+    relationships:
+      database: db:mysql
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    web:
+      locations:
+        /:
+          allow: true
+          expires: 600
+          index:
+          - index.php
+          passthru: /index.php
+          root: web
+          rules:
+            ^/composer\.json:
+              allow: false
+            ^/license\.txt$:
+              allow: false
+            ^/readme\.html$:
+              allow: false
+          scripts: true
+        /wp/wp-content/cache:
+          allow: false
+          root: web/wp/wp-content/cache
+          scripts: false
+        /wp/wp-content/uploads:
+          allow: false
+          root: web/app/uploads
+          rules:
+            ? (?<!\-lock)\.(?i:jpe?g|gif|png|svg|bmp|ico|css|js(?:on)?|eot|ttf|woff|woff2|pdf|docx?|xlsx?|pp[st]x?|psd|odt|key|mp[2-5g]|m4[av]|og[gv]|wav|mov|wm[av]|avi|3g[p2])$
+            : allow: true
+              expires: 1w
+          scripts: false
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    cache:
+      cookies:
+      - /^wordpress_logged_in_/
+      - /^wordpress_sec_/
+      - wordpress_test_cookie
+      - /^wp-settings-/
+      - /^wp-postpass/
+      - /^wp-resetpass-/
+      enabled: true
+    type: upstream
+    upstream: app:http
+services:
+  db:
+    type: mariadb:10.4
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

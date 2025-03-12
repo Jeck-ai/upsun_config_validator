@@ -1,0 +1,57 @@
+another_invalid:
+  another:
+  - 1
+  - 2
+  - 3
+  nested: value
+applications:
+  app:
+    build:
+      flavor: none
+    dependencies:
+      nodejs:
+        yarn: 1.22.5
+    hooks:
+      build: 'yarn
+
+        yarn build
+
+        '
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      locations:
+        /:
+          allow: true
+          index:
+          - index.html
+          root: public
+          scripts: false
+invalid_element: This shouldn't be here
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+random_data:
+- name: item1
+  value: 123
+- name: item2
+  value: string
+routes:
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local
