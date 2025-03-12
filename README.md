@@ -57,6 +57,7 @@ This library enforces strict schema validation to catch configuration errors bef
 - Provides detailed error messages with specific validation failures
 - Provides recommendations when possible
 - Includes comprehensive test suite with passing and failing examples
+- Provides access to example configuration templates for various frameworks
 
 ## Installation
 
@@ -133,6 +134,33 @@ success, message = validate_string(invalid_type_config)
 print(message)  # Will show error about type mismatch
 ```
 
+### Using the template library
+
+```python
+from upsunvalidator import get_available_template_names, get_template_config, get_template_config_with_info
+
+# Get list of available template names
+template_names = get_available_template_names()
+print(template_names)  # ['akeneo', 'directus', 'django4', 'drupal11', 'express', ...]
+
+# Get a specific template's config.yaml content
+wordpress_config = get_template_config('wordpress-vanilla')
+print(wordpress_config)  # YAML content as string
+
+# Get templates with descriptions for easier selection
+templates_info = get_template_config_with_info()
+for name, (description, _) in templates_info.items():
+    print(f"{name}: {description}")
+
+# Get and use a specific template
+laravel_config = get_template_config('laravel')
+if laravel_config:
+    # Validate the template
+    from upsunvalidator import validate_string
+    success, message = validate_string(laravel_config)
+    print(message)
+```
+
 ## Testing
 
 The project includes a comprehensive test suite:
@@ -155,7 +183,7 @@ We're very interested in adding to the passing configs. If you have working conf
 1. Create an issue
 2. Fork the repository
 3. Create your feature branch (`git checkout -b feature/amazing-feature`)
-4. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/files/...`
+4. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/.upsun/config.yaml`
 5. Commit your changes (`git commit -am 'Add some amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
