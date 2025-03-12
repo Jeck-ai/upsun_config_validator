@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.2] - 2025-03-XX
+## [0.1.2] - 2025-03-12
 
 ### Additional post-release fixes
 
