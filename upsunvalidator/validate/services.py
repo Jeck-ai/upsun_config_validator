@@ -1,6 +1,5 @@
 import re
 import difflib
-import random
 
 from upsunvalidator.schemas.services import SERVICE_VERSIONS
 
@@ -122,7 +121,6 @@ def validate_service_type(service_type, service_name, service_or_runtime):
         type: '{recommended_runtime}:{valid_versions[0]}'
     ```
 """
-        # print(difflib.get_close_matches(service_name, valid_runtimes)[0])
         return False, error_message
 
     # Catch service types that are valid under 'services', but not under 'applications'.

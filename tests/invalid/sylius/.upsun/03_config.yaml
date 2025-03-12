@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+applications:
+  app:
+    build:
+      flavor: composer
+    dependencies:
+      nodejs:
+        gulp-cli: '*'
+        n: '*'
+        yarn: '*'
+      php:
+        composer/composer: ^2
+    hooks:
+      build: 'set -e
+
+        # Install the node version specified in the .nvmrc file
+
+        n auto
+
+        # Reset the location hash to recognize the newly installed version
+
+        hash -r
+
+        yarn install
+
+        GULP_ENV=prod yarn build
+
+        '
+      deploy: 'set -e
+
+        rm -rf var/cache/*
+
+        mkdir -p public/media/image
+
+        bin/console sylius:install -n
+
+        bin/console sylius:fixtures:load -n
+
+        bin/console assets:install --symlink --relative public
+
+        bin/console cache:clear
+
+        '
+    mounts:
+      /public/media:
+        source: storage
+        source_path: files/media
+      /public/uploads:
+        source: storage
+        source_path: files/uploads
+      /var/cache:
+        source: storage
+        source_path: files/cache
+      /var/log:
+        source: storage
+        source_path: files/log
+      /var/sessions:
+        source: storage
+        source_path: files/sessions
+    relationships:
+      database: db:mysql
+    source:
+      root: /
+    type: php:8.1
+    variables:
+      env:
+        APP_DEBUG: 0
+        APP_ENV: prod
+        N_PREFIX: /app/.global
+    web:
+      locations:
+        /:
+          allow: true
+          expires: -1
+          passthru: /index.php
+          root: public
+          scripts: true
+        /assets/shop:
+          allow: false
+          expires: 2w
+          passthru: true
+          rules:
+            ? \.(css|js|jpe?g|png|gif|svgz?|ico|bmp|tiff?|wbmp|ico|jng|bmp|html|pdf|otf|woff2|woff|eot|ttf|jar|swf|ogx|avi|wmv|asf|asx|mng|flv|webm|mov|ogv|mpe|mpe?g|mp4|3gpp|weba|ra|m4a|mp3|mp2|mpe?ga|midi?)$
+            : allow: true
+        /media/cache:
+          allow: false
+          expires: 2w
+          passthru: true
+          rules:
+            \.(jpe?g|png|gif|svgz?)$:
+              allow: true
+        /media/cache/resolve:
+          allow: true
+          expires: -1
+          passthru: /index.php
+          scripts: true
+        /media/image:
+          allow: false
+          expires: 2w
+          passthru: true
+          rules:
+            \.(jpe?g|png|gif|svgz?)$:
+              allow: true
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  db:
+    type: mysql:10.3
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform

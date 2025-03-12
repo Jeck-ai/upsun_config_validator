@@ -1,0 +1,58 @@
+applications:
+  app:
+    dependencies:
+      python3:
+        pipenv: 2023.2.4
+    hooks:
+      build: 'set -eu
+
+
+        # Download the latest version of pip
+
+        python3.11 -m pip install --upgrade pip
+
+        pipenv --python 3.11
+
+
+        # Install dependencies
+
+        pipenv install --deploy
+
+        '
+    mounts:
+      .cache:
+        source: storage
+        source_path: cache
+    relationships:
+      database: db:mysql
+      rediscache: cache:redis
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: python:3.11
+    web: {}
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  cache:
+    type: redis:6.2
+  db:
+    type: mariadb:10.4
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

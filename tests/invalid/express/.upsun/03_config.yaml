@@ -1,0 +1,29 @@
+applications:
+  app:
+    relationships:
+      database: db:mysql
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      commands:
+        # Subtle issue - using an object instead of string for start command
+        start: 
+          command: node index.js
+          options: {}
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  db:
+    type: mariadb:10.4

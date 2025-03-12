@@ -1,0 +1,40 @@
+applications:
+  app:
+    build:
+      flavor: none
+    hooks:
+      build: 'corepack yarn install --frozen-lockfile
+
+        corepack yarn build
+
+        '
+    mounts:
+      .data:
+        source: storage
+        source_path: .data
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:18
+    variables:
+      env:
+        NUXT_TELEMETRY_DISABLED: 1
+    web:
+      commands:
+        start: node .output/server/index.mjs
+crons:
+  cleanup:
+    cmd: cleanup.sh
+    spec: 0 */6 * * *
+routes:
+  https://www.{default}/:
+    type: upstream
+    upstream: app:http
+  https://{default}/:
+    to: https://www.{default}/
+    type: redirect

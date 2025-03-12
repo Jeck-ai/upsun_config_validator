@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+applications:
+  app:
+    relationships:
+      database: db:mysql
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      commands:
+        start: node index.js
+disk: 2048
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  db:
+    type: mariadb:10.4
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform

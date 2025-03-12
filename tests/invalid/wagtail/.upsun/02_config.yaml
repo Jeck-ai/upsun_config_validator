@@ -1,0 +1,63 @@
+applications:
+  app:
+    dependencies:
+      python3:
+        pipenv: 2022.1.8
+    hooks:
+      build: 'pipenv install --system --deploy
+
+        mkdir logs
+
+        python manage.py collectstatic
+
+        rm -rf logs
+
+        '
+      deploy: 'python manage.py migrate
+
+        '
+    mounts: /var/data:/data:rw
+    relationships:
+      database: db:postgresql
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: python:3.9
+    web:
+      commands:
+        start: gunicorn -w 4 -b unix:$SOCKET myapp.wsgi:application
+      locations:
+        /:
+          passthru: true
+        /static:
+          allow: true
+          expires: 1h
+          root: static
+      upstream:
+        socket_family: unix
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  db:
+    type: postgresql:12
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

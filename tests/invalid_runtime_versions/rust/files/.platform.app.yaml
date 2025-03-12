@@ -1,9 +1,0 @@
-name: app
-type: rust:15  # Invalid version number
-web:
-    commands:
-        start: ./target/release/app
-    locations:
-        "/":
-            root: "static"
-            allow: true

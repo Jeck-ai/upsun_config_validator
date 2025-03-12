@@ -1,0 +1,164 @@
+applications:
+  app:
+    build:
+      flavor: none
+    crons:
+      logrotate:
+        cmd: shtool rotate -n10 $PLATFORM_APP_DIR/var/log/*.log
+        spec: 45 1 * * *
+      magento:
+        cmd: bash -c 'for group in $(grep -shoP "(?<=<group id=\")(.+)(?=\">)" {app,vendor}/*/*/etc/cron_groups.xml);
+          do echo -n Running cron group ${group} --- && php -d memory_limit=-1 bin/magento
+          cron:run --group=${group}; done'
+        spec: '*/5 * * * *'
+      reportcleanup:
+        cmd: find $PLATFORM_APP_DIR/var/report/* -mtime +10 -delete
+        spec: 0 2 * * *
+    dependencies:
+      php:
+        composer/composer: ^2
+    hooks:
+    - build.sh
+    - deploy.sh
+    - post_deploy.sh
+    mounts:
+      /app/etc:
+        source: storage
+        source_path: etc
+      /pub/media:
+        source: storage
+        source_path: media
+      /pub/static:
+        source: storage
+        source_path: static
+      /var:
+        source: storage
+        source_path: var
+    relationships:
+      database:
+        endpoint: write
+        service: db
+      database-slave:
+        endpoint: read
+        service: db
+      opensearch: indexer:opensearch
+      rabbitmq: queue:rabbitmq
+      redis:
+        endpoint: redis
+        service: cache
+      redis-session: session:redis
+      redis-slave:
+        endpoint: redis-replica
+        service: cache
+    runtime:
+      extensions:
+      - xsl
+      - sodium
+      - redis
+      - blackfire
+    source:
+      root: /
+    type: php:8.3
+    variables:
+      env:
+        MAGENTO_DC_INDEXER__USE_APPLICATION_LOCK: true
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOGINVENTORY_STOCK__SIMPLE: 200
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOGPERMISSIONS_CATEGORY: 999
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOGSEARCH_FULLTEXT__ELASTIC_SAVE: 500
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOGSEARCH_FULLTEXT__MYSQL_GET: 500
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOGSEARCH_FULLTEXT__PARTIAL_REINDEX: 100
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOG_CATEGORY_PRODUCT: 666
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOG_PRODUCT_PRICE__CONFIGURABLE: 666
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOG_PRODUCT_PRICE__DEFAULT: 500
+        MAGENTO_INDEXER_BATCH_SIZE__CATALOG_PRODUCT_PRICE__SIMPLE: 200
+        MAGENTO_INDEXER_BATCH_SIZE__INVENTORY__CONFIGURABLE: 616
+        MAGENTO_INDEXER_BATCH_SIZE__INVENTORY__DEFAULT: 510
+        MAGENTO_INDEXER_BATCH_SIZE__INVENTORY__SIMPLE: 210
+        NODE_VERSION: 20
+        NVM_VERSION: master
+      php:
+        memory_limit: 512M
+    web:
+      locations:
+        /:
+          allow: false
+          expires: -1
+          index:
+          - index.php
+          passthru: /index.php
+          root: pub
+          rules:
+            ? \.(css|js|map|hbs|gif|jpe?g|png|tiff|wbmp|ico|jng|bmp|svgz|midi?|mp?ga|mp2|mp3|m4a|ra|weba|3gpp?|mp4|mpe?g|mpe|ogv|mov|webm|flv|mng|asx|asf|wmv|avi|ogx|swf|jar|ttf|eot|woff|otf|html?)$
+            : allow: true
+            ^/.well-known/apple-developer-merchantid-domain-association.txt$:
+              passthru: /media/apple-developer-merchantid-domain-association.txt
+            ^/.well-known/apple-developer-merchantid-domain-association.xml$:
+              passthru: /media/apple-developer-merchantid-domain-association.xml
+            ^/sitemap(.*)\.xml$:
+              passthru: /media/sitemap$1.xml
+          scripts: true
+        /media:
+          allow: true
+          expires: 30d
+          passthru: /get.php
+          root: pub/media
+          scripts: false
+        /static:
+          allow: true
+          expires: 30d
+          passthru: /front-static.php
+          root: pub/static
+          rules:
+            ^/static/version\d+/(?<resource>.*)$:
+              passthru: /static/$resource
+          scripts: false
+routes:
+  https://{all}/:
+    type: upstream
+    upstream: app:http
+  https://{all}/static/:
+    cache:
+      cookies: []
+      enabled: true
+    type: upstream
+    upstream: app:http
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+  https://{default}/static/:
+    cache:
+      cookies: []
+      enabled: true
+    type: upstream
+    upstream: app:http
+services:
+  cache:
+    configuration:
+      maxmemory_policy: allkeys-lru
+    type: redis:7.2
+  db:
+    configuration:
+      endpoints:
+        read:
+          default_schema: main
+          privileges:
+            main: ro
+        write:
+          default_schema: main
+          privileges:
+            main: admin
+      schemas:
+      - main
+    type: mariadb:10.6
+  indexer:
+    configuration:
+      plugins:
+      - analysis-phonetic
+      - analysis-icu
+    type: opensearch:2
+  queue:
+    type: rabbitmq:3.13
+  session:
+    configuration:
+      maxmemory_policy: allkeys-lru
+    type: redis-persistent:7.2
