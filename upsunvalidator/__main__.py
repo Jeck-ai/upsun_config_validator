@@ -94,13 +94,6 @@ def read_config(ctx, param, value):
     return value
 
 @click.command(cls=AliasedGroup)
-# @click.option(
-#     "--config",
-#     type=click.Path(exists=True, dir_okay=False),
-#     callback=read_config,
-#     expose_value=False,
-#     help="The config file to use instead of the default.",
-# )
 def cli():
     """Helper library for producing and ensuring valid Upsun & Platform.sh PaaS configuration against their schemas.
     
@@ -180,18 +173,7 @@ def validate(src, provider):
 
         print(results[0])
 
-@cli.command 
-def generate(**args):
-    """Generate configuration files for a given PaaS.
-    
-    This command is currently being developed.
-
-    Alias: gen
-    """
-    print("Coming soon...") 
-
 cli.add_command(validate)
-cli.add_command(generate)
 
 if __name__ == '__main__':
     cli()
