@@ -78,8 +78,11 @@ Here's how to set up `upsunvalidator` for local development.
    cd upsunvalidator
    python3 -m venv venv
    source venv/bin/activate
+   pip install --upgrade pip
    pip install -e .
    ```
+
+   As you make changes to core, you will likely need to run `pip install -e .` again to test your revisions.
 
 4. Create a branch for local development:
 

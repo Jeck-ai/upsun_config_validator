@@ -14,7 +14,8 @@ dependencies = [
     "click",
     "pyyaml",
     "jsonschema",
-    "pytest"
+    "pytest",
+    "ruamel.yaml"
 ]
 
 [project.urls]
