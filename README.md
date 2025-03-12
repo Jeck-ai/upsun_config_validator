@@ -137,6 +137,7 @@ The project includes a comprehensive test suite:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install .
 pytest
 ```

@@ -177,15 +177,3 @@ cli.add_command(validate)
 
 if __name__ == '__main__':
     cli()
-
-
-
-# While developing, add the `pipenv run python -m` prefix to all of the below commands:
-
-# # Valid
-# upsunvalidator validate --src tests/valid/shopware/files --provider upsun
-
-# # Invalid
-# upsunvalidator validate --src tests/invalid_runtime_versions/nodejs/files --provider upsun
-# upsunvalidator validate --src tests/invalid_service_versions/mariadb/files --provider upsun
-# upsunvalidator validate --src tests/invalid_enable_php_extensions/php/files --provider upsun
