@@ -159,6 +159,40 @@ def _check_data_types(config):
             if 'type' in service_config and not isinstance(service_config['type'], str):
                 raise ValidationError(f"Service '{service_name}' type must be a string")
 
+def _check_for_local_mounts(config):
+    """
+    Check for 'local' mount sources that are deprecated but still supported for backward compatibility
+    
+    Args:
+        config (dict): Parsed YAML configuration
+        
+    Raises:
+        ValidationError: If 'local' mount source is found
+    """
+    if 'applications' in config and isinstance(config['applications'], dict):
+        for app_name, app_config in config['applications'].items():
+            if isinstance(app_config, dict) and 'mounts' in app_config and isinstance(app_config['mounts'], dict):
+                for mount_path, mount_config in app_config['mounts'].items():
+                    if isinstance(mount_config, dict) and 'source' in mount_config and mount_config['source'] == 'local':
+                        error_message = f"""
+✘ Backward compatibility issue found in application '{app_name}' mount '{mount_path}':
+
+  'local' is a deprecated mount source type from Platform.sh. While Upsun still accepts it 
+  for backward compatibility, it is not recommended for new configurations.
+  
+  Please replace 'source: local' with 'source: storage' in your mount configuration:
+  
+  applications:
+    {app_name}:
+      mounts:
+        '{mount_path}':
+          source: storage  # <-- Change from 'local' to 'storage'
+          source_path: "{mount_config.get('source_path', 'data')}"
+          
+  This will ensure your configuration is compatible with current Upsun standards.
+"""
+                        raise ValidationError(error_message)
+
 def _validate_config(config):
     """
     Internal function to validate the Upsun config structure
@@ -186,12 +220,47 @@ def _validate_config(config):
     # Validate data types before schema validation
     _check_data_types(config)
     
+    # Check for 'local' mount sources (deprecated but supported for backward compatibility)
+    _check_for_local_mounts(config)
+    
     # Validate against schema to catch structural issues early
     try:
         validate(instance=config, schema=UPSUN_SCHEMA)
     except ValidationError as e:
         # Enhance the error message to make it more clear
         error_message = str(e)
+        
+        # Special handling for 'local' mount source validation errors
+        if "local" in error_message and "source" in error_message and "'local' is not one of" in error_message and "enum" in error_message:
+            # Extract details from error message
+            mount_path = "unknown"
+            app_name = "unknown"
+            
+            # Try to extract mount path and app name from error message
+            import re
+            match = re.search(r"On instance\['applications'\]\['([^']+)'\]\['mounts'\]\['([^']+)'\]", error_message)
+            if match:
+                app_name = match.group(1)
+                mount_path = match.group(2)
+            
+            custom_message = f"""
+✘ Backward compatibility issue detected in application '{app_name}' mount '{mount_path}':
+
+  'local' is a deprecated mount source type from Platform.sh. While Upsun still accepts it 
+  for backward compatibility, it is not recommended for new configurations.
+  
+  Please replace 'source: local' with 'source: storage' in your mount configuration:
+  
+  applications:
+    {app_name}:
+      mounts:
+        '{mount_path}':
+          source: storage  # <-- Change from 'local' to 'storage'
+          source_path: "data"  # <-- Use your actual source_path here
+          
+  This will ensure your configuration is compatible with current Upsun standards.
+"""
+            raise ValidationError(custom_message)
         
         # Make additionalProperties errors more explicit
         if "additionalProperties" in error_message:
