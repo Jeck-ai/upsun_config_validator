@@ -18,8 +18,12 @@ dynamic = ["version"]
 dependencies = [
     "pyyaml",
     "jsonschema",
-    "pytest",
     "ruamel.yaml"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
 ]
 
 [project.urls]
