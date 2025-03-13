@@ -1,6 +1,6 @@
 """Validation library for Upsun Configuration."""
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 from upsunvalidator.__main__ import validate, validate_string
 from upsunvalidator.templates import (
