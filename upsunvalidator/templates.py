@@ -9,8 +9,7 @@ def _get_valid_templates_dir() -> pathlib.Path:
     """Return the path to the valid templates directory."""
     # Find the directory where the tests/valid templates are located
     module_path = pathlib.Path(__file__).parent
-    project_root = module_path.parent
-    return project_root / "tests" / "valid"
+    return module_path / "tests" / "valid"
 
 
 def get_available_template_names() -> List[str]:

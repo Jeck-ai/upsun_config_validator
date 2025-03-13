@@ -22,4 +22,4 @@ Home = "https://jeck.ai"
 Source = "https://github.com/Jeck-ai/upsunvalidator"
 
 [tool.flit.sdist]
-include = ["tests/valid/", "tests/valid/**/*"]
+include = ["upsunvalidator/tests/valid/", "upsunvalidator/tests/valid/**/*"]

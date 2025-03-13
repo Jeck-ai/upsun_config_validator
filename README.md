@@ -190,7 +190,7 @@ We're very interested in adding to the passing configs. If you have working conf
 1. Create an issue
 2. Fork the repository
 3. Create your feature branch (`git checkout -b feature/amazing-feature`)
-4. Add you configuration to the `tests/valid` using the pattern `tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/.upsun/config.yaml`
+4. Add you configuration to the `upsunvalidator/tests/valid` using the pattern `upsunvalidator/tests/valid/YOUR_EXAMPLE_OR_FRAMEWORK_NAME/.upsun/config.yaml`
 5. Commit your changes (`git commit -am 'Add some amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
