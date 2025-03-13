@@ -1,15 +1,20 @@
 [build-system]
-requires = ["flit_core >=3.11,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "upsunvalidator/_version.py"
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
 
 [project]
 name = "upsunvalidator"
 authors = [{name = "Jeck.ai", email = "robert@jeck.ai"}]
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE"]
+license = {text = "MIT"}
 requires-python = ">=3.12"
-dynamic = ["version", "description"]
+description = "Validation library for Upsun Configuration"
+dynamic = ["version"]
 dependencies = [
     "pyyaml",
     "jsonschema",
@@ -21,5 +26,5 @@ dependencies = [
 Home = "https://jeck.ai"
 Source = "https://github.com/Jeck-ai/upsunvalidator"
 
-[tool.flit.sdist]
-include = ["upsunvalidator/tests/valid/", "upsunvalidator/tests/valid/**/*"]
+[tool.setuptools.package-data]
+upsunvalidator = ["tests/valid/**/*"]
