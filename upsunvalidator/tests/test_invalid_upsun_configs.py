@@ -56,6 +56,19 @@ def should_validate_as_invalid(config_path):
                     if "type" not in app and "stack" not in app:
                         return True  # Missing required field
     
+    # Files with 04_ prefix should have root paths that start with a slash
+    elif filename.startswith("04_"):
+        # Look for root paths that start with a slash
+        if yaml_data and isinstance(yaml_data, dict):
+            if "applications" in yaml_data and isinstance(yaml_data["applications"], dict):
+                for app_name, app in yaml_data["applications"].items():
+                    if "web" in app and isinstance(app["web"], dict):
+                        if "locations" in app["web"] and isinstance(app["web"]["locations"], dict):
+                            for location_path, location in app["web"]["locations"].items():
+                                if "root" in location and isinstance(location["root"], str):
+                                    if location["root"].startswith("/"):
+                                        return True  # Root path starts with a slash
+    
     # If we can't determine from simple checks, default to expecting it to be invalid
     return "invalid" in os.path.dirname(config_path)
 
@@ -83,6 +96,9 @@ def test_invalid_upsun_templates(config_path):
             
         if filename.startswith("03_") and "applications" in yaml_content and "type:" not in yaml_content:
             assert any(term in message.lower() for term in ["required", "missing"]), f"Expected required field error for {filename}"
+            
+        if filename.startswith("04_") and "root: " in yaml_content and "root: \"/public\"" in yaml_content:
+            assert any(term in message for term in ["must not start with a slash", "leading slash"]), f"Expected root path validation error for {filename}"
     else:
         # Some files in the invalid directory might actually be valid - that's fine
         pass

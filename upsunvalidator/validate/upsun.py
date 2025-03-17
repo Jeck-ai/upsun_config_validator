@@ -193,6 +193,41 @@ def _check_for_local_mounts(config):
 """
                         raise ValidationError(error_message)
 
+def _check_locations_root_paths(config):
+    """
+    Check that root paths in web.locations don't start with a slash
+    
+    Args:
+        config (dict): Parsed YAML configuration
+        
+    Raises:
+        ValidationError: If a root path starts with a slash
+    """
+    if 'applications' in config and isinstance(config['applications'], dict):
+        for app_name, app_config in config['applications'].items():
+            if isinstance(app_config, dict) and 'web' in app_config and isinstance(app_config['web'], dict):
+                if 'locations' in app_config['web'] and isinstance(app_config['web']['locations'], dict):
+                    for location_path, location_config in app_config['web']['locations'].items():
+                        if isinstance(location_config, dict) and 'root' in location_config:
+                            if location_config['root'] and location_config['root'].startswith('/'):
+                                error_message = f"""
+✘ Error found in application '{app_name}' web locations '{location_path}':
+
+  The 'root' path '{location_config['root']}' must not start with a slash.
+  
+  Please modify your configuration:
+  
+  applications:
+    {app_name}:
+      web:
+        locations:
+          '{location_path}':
+            root: "{location_config['root'][1:]}"  # <-- Remove the leading slash
+            
+  Paths in the 'root' property should be relative to the application root and not start with '/'.
+"""
+                                raise ValidationError(error_message)
+
 def _validate_config(config):
     """
     Internal function to validate the Upsun config structure
@@ -222,6 +257,9 @@ def _validate_config(config):
     
     # Check for 'local' mount sources (deprecated but supported for backward compatibility)
     _check_for_local_mounts(config)
+    
+    # Check that web.locations root paths don't start with a slash
+    _check_locations_root_paths(config)
     
     # Validate against schema to catch structural issues early
     try:

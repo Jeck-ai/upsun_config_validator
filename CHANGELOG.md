@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1] - 2025-03-17
+
+### Bug fix
+
+Added validation to catch an error with leading slashes in web.locations root paths:
+
+- Added check to ensure root paths in web.locations don't start with a slash (causes deployment failures)
+- When a leading slash is detected, provides clear error message and suggests the fix
+
 ## [0.2.0] - 2025-03-12
 
 Library was restructured to prioritize string-based validation prompts for the MCP use case.

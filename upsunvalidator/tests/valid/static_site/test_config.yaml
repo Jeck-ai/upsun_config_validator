@@ -1,0 +1,32 @@
+applications:
+  jeck-ai-teaser-static:
+    source:
+      root: "/"
+    type: "nodejs:20"
+    
+    build:
+      flavor: none
+      
+    web:
+      locations:
+        "/":
+          root: ""
+          index: ["index.html"]
+          scripts: false
+          allow: true
+      
+    hooks:
+      build: |
+        set -eux
+        # No build steps needed for this static site
+      deploy: |
+        set -eux
+        # No deployment commands needed
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "jeck-ai-teaser-static:http"
+  "https://www.{default}":
+    type: redirect
+    to: "https://{default}/"

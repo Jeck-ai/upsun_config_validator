@@ -1,0 +1,19 @@
+applications:
+  app:
+    type: 'nodejs:20'
+    
+    build:
+      flavor: none
+      
+    web:
+      locations:
+        "/":
+          root: "/public"  # This should fail validation - path starts with a slash
+          index: ["index.html"]
+          scripts: false
+          allow: true
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "app:http"
