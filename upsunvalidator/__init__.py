@@ -5,7 +5,7 @@ try:
 except ImportError:
     __version__ = "0.0.0.dev0"  # Fallback version if not installed from git
 
-from upsunvalidator.__main__ import validate, validate_string
+from upsunvalidator.validate.validate import validate, validate_string
 from upsunvalidator.examples import (
     get_available_example_names,
     get_example_config,

@@ -6,11 +6,7 @@ import yaml
 from upsunvalidator import validate_string
 from upsunvalidator.utils.utils import load_yaml_file
 
-# Get the current directory (tests folder)
-TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Invalid tests directory
-FAILING_DIR = os.path.join(TESTS_DIR, 'invalid')
+from . import TESTS_DIR, FAILING_DIR
 
 def get_all_invalid_config_paths(directory):
     """Get all .upsun/*_config.yaml file paths."""
@@ -30,6 +26,7 @@ def should_validate_as_invalid(config_path):
     filename = os.path.basename(config_path)
     
     # Files with 01_ prefix should have additional properties
+    # @ todo: add tests for duplicate keys
     if filename.startswith("01_"):
         # Check for known invalid top-level properties
         if yaml_data and isinstance(yaml_data, dict):
