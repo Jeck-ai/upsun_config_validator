@@ -1,14 +1,12 @@
 import pytest
 import os
+import pathlib
 
 from upsunvalidator import validate_string
 from upsunvalidator.utils.utils import load_yaml_file
 
-# Get the current directory (tests folder)
-TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Valid tests directory
-PASSING_DIR = os.path.join(TESTS_DIR, 'valid')
+# Valid tests directory (examples)
+from .shared import PASSING_DIR
 
 def get_all_upsun_config_paths(directory):
     """Get all .upsun/config.yaml file paths."""
@@ -21,7 +19,7 @@ def get_all_upsun_config_paths(directory):
     return result
 
 @pytest.mark.parametrize("config_path", get_all_upsun_config_paths(PASSING_DIR))
-def test_valid_upsun_templates(config_path):
+def test_valid_upsun_examples(config_path):
     """Test that all .upsun/config.yaml files are valid when validated as strings."""
     yaml_content = load_yaml_file(config_path)
     is_valid, message = validate_string(yaml_content)
