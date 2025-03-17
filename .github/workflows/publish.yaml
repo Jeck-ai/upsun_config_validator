@@ -1,12 +1,17 @@
 ---
 name: Publish (pypi)
+
 on:
-    # Workflow will run when a release has been published for the package
-    release:
-        types:
-            - published
-    # Allows you to run this workflow manually from the Actions tab
-    workflow_dispatch:
+    push: ~
+    pull_request: ~
+
+# on:
+#     # Workflow will run when a release has been published for the package
+#     release:
+#         types:
+#             - published
+#     # Allows you to run this workflow manually from the Actions tab
+#     workflow_dispatch:
 
 env:
     PYTHON_VERSION: 3.13
@@ -30,5 +35,7 @@ jobs:
             run: pip install setuptools setuptools_scm build twine
           - name: Build package
             run: python -m build
-          - name: Publish to PyPI
-            run: python -m twine upload dist/*
+          - name: Get version
+            run: python -m setuptools_scm
+          # - name: Publish to PyPI
+          #   run: python -m twine upload dist/*
