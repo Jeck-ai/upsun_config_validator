@@ -80,7 +80,10 @@ pip install --upgrade upsunvalidator
 
 ## Usage
 
-### Using in your code
+The primary use case of this library is to allow users to import the validator library into their applications -- namely MCP server tools -- to validate configuration strings and/or built-in examples.
+A secondary use case, primarily to simplify local testing, is a built-in CLI utility for validating strings, built-in examples, and file paths directly from the command line.
+
+### Importing the validator into your code
 
 ```python
 from upsunvalidator import validate, validate_string
@@ -140,7 +143,7 @@ success, message = validate_string(invalid_type_config)
 print(message)  # Will show error about type mismatch
 ```
 
-### Using the template library
+### Using the built-in examples library
 
 ```python
 from upsunvalidator import get_available_example_names, get_example_config, get_example_config_with_info
@@ -165,6 +168,27 @@ if laravel_config:
     from upsunvalidator import validate_string
     success, message = validate_string(laravel_config)
     print(message)
+```
+
+### Running from the command line
+
+> [!IMPORTANT]  
+> This is not the primary use case for this tool, and exists mainly for development purposes supporting the use cases above.
+
+```bash
+# Validate a directory
+
+upsunvalidator validate --src $(pwd)
+
+# Validate a file
+
+upsunvalidator validate --file $(pwd)/.upsun/config.yaml
+
+# Validate string contents
+
+FILE_CONTENTS=$(cat .upsun/config.yaml)
+
+upsunvalidator validate --string $FILE_CONTENTS
 ```
 
 ## Testing
