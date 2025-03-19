@@ -5,9 +5,9 @@ def load_yaml_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
-def get_yaml_files(directory):
+def get_yaml_files(directory, recursive=True):
     yaml_files = {}
-    for file in glob.glob(f"{directory}/**/*.yaml", recursive=True, include_hidden=True):
+    for file in glob.glob(f"{directory}/**/*.yaml", recursive=recursive, include_hidden=True):
         if ".upsun" in file:
             if "upsun" not in yaml_files:
                 yaml_files["upsun"] = [file]

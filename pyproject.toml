@@ -18,12 +18,9 @@ dynamic = ["version"]
 dependencies = [
     "pyyaml",
     "jsonschema",
-    "ruamel.yaml"
-]
-
-[project.optional-dependencies]
-test = [
-    "pytest>=7.0.0",
+    "ruamel.yaml",
+    "pytest",
+    "click"
 ]
 
 [project.urls]
@@ -32,3 +29,6 @@ Source = "https://github.com/Jeck-ai/upsunvalidator"
 
 [tool.setuptools.package-data]
 upsunvalidator = ["tests/valid/**/*"]
+
+[project.scripts]
+upsunvalidator = "upsunvalidator.__main__:cli"

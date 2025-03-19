@@ -2,8 +2,8 @@ import yaml
 import ruamel.yaml
 from ruamel.yaml.constructor import DuplicateKeyError
 
-# import sys
-# sys.tracebacklimit=0
+import sys
+sys.tracebacklimit=0
 
 from jsonschema import validate
 
@@ -101,7 +101,7 @@ def validate_upsun_config(yaml_files):
 
         return _validate_config(combined)
     else:
-        return ["✔ No errors found. YAML is valid.\n"]
+        return ["\n✔ No errors found. YAML is valid.\n"]
 
 
 def _check_data_types(config):
@@ -337,4 +337,4 @@ def _validate_config(config):
                 if not is_valid:
                     raise ValidationError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
 
-    return ["✔ No errors found. YAML is valid.\n"]
+    return ["\n✔ No errors found. YAML is valid.\n"]
