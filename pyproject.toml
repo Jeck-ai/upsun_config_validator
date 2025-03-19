@@ -20,7 +20,8 @@ dependencies = [
     "jsonschema",
     "ruamel.yaml",
     "pytest",
-    "click"
+    "click",
+    "click-extra"
 ]
 
 [project.urls]

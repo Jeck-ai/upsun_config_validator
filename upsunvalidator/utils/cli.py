@@ -1,13 +1,6 @@
-
-# from upsunvalidator.validate.validate import validate
-
-# if __name__ == '__main__':
-#     # Simple example usage
-#     success, message = validate()
-#     print(message)
-
 import os
 import click
+from click_extra import command, echo, pass_context, table_format_option
 
 import upsunvalidator
 
@@ -17,6 +10,8 @@ from upsunvalidator.utils.utils import load_yaml_file
 from upsunvalidator.validate.validate import validate_all 
 from upsunvalidator.validate.upsun import validate_upsun_config
 from upsunvalidator.validate.upsun import validate_upsun_config_string
+
+from upsunvalidator.examples import get_example_info, get_example_config
 
 from upsunvalidator.utils.utils import make_bold_text
 
@@ -123,7 +118,8 @@ def version(**args):
 @click.option("--src", help="Repository location you'd like to validate.", type=str)
 @click.option("--file", help="Location of a particular file you'd like to validate", type=str)
 @click.option("--string", help="File contents (string) to validate.", type=str)
-def validate(src, file, string):
+@click.option("--example", help="Built-in example to validate.", type=str)
+def validate(src, file, string, example):
     """Validate a project's configuration files against PaaS schemas.
     
     Example:
@@ -143,7 +139,7 @@ def validate(src, file, string):
         upsunvalidator validate --string $FILE_CONTENTS
     """
 
-    if not string and not file and not src:
+    if not string and not file and not src and not example:
         # If no arguments are passed, assume we are validating the current directory, where `.upsun` is in root.
         src = os.getcwd()
         yaml_files = get_yaml_files(src, recursive=False)
@@ -154,7 +150,7 @@ def validate(src, file, string):
             print(f"\n✘ No Upsun configuration files found in {src}.\n\n  Exiting.\n")
 
     # only `src` is provided.
-    elif src and not string and not file:
+    elif src and not string and not file and not example:
         yaml_files = get_yaml_files(src, recursive=False)
         if "upsun" in yaml_files:
             results = validate_upsun_config(yaml_files)
@@ -163,18 +159,46 @@ def validate(src, file, string):
             print(f"\n✘ No Upsun configuration files found in {src}.\n\n  Exiting.\n")
 
     # only `file` is provided.
-    elif file and not string and not src:
+    elif file and not string and not src and not example:
         yaml_contents = load_yaml_file(file)
         results = validate_upsun_config_string(yaml_contents)
         print(results[0])
 
     # only `string` is provided.
-    elif string and not file and not src:
+    elif string and not file and not src and not example:
         results = validate_upsun_config_string(string)
         print(results[0])
 
+    # only `example` is provided.
+    elif example and not file and not src and not string:
+
+        config = get_example_config(example)
+
+        if config is not None:
+            results = validate_upsun_config_string(config)
+            print(results[0])
+        else:
+            print(f"\n✘ `{example}` is not a valid built-in example option.\n\n  Run `upsunvalidator examples` to list available examples.\n")
+
+    # Multiple options were provided. 
+    else:
+        print(f"\n✘ You've provided two many options.\n\n  Exiting.\n")
+        ctx = click.get_current_context()
+        click.echo(ctx.get_help())
+        ctx.exit()
+
+@cli.command()
+@table_format_option
+@pass_context
+def examples(ctx):
+    """List available built-in Upsun examples as a table.
+    """
+    data = get_example_info()
+    headers = ("Example name", "Description")
+    ctx.print_table(list(data.items()), headers)
+
 cli.add_command(validate)
+cli.add_command(examples)
 
 if __name__ == '__main__':
     cli()
-
