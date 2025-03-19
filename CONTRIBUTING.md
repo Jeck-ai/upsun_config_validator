@@ -90,7 +90,10 @@ Here's how to set up `upsunvalidator` for local development.
    git checkout -b name-of-your-bugfix-or-feature
    ```
 
-Now you can make your changes locally.
+   While not the primary use case, you can use the `upsunvalidator` CLI as a quick way to test changes that you make.
+   Run the command `upsunvalidator --help` for available commands.
+
+Now you can make your changes locally. 
 
 5. When you're done making changes, check that your changes pass the tests and lint check:
 
