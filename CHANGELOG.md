@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.3.1] - 2025-03-13
+
+Multiple small changes made ahead of internal demo:
+
+- Adding valid tests for hugo, django-pgvector, and django-redis-celery
+- Fixed up sorting hugos between valid and invalid
+
+## [0.3.0] - 2025-03-13
+
+Release tools: changed from `flit` to `setuptools_scm`.
+
+## [0.2.5] - 2025-03-13
+
+Automatic versioning for releases was implemented.
+
+## [0.2.4] - 2025-03-13
+
+All tests were moved within the package itself.
+
+## [0.2.3] - 2025-03-13
+
+New tag to bundle previous incremental changes.
+
+## [0.2.2] - 2025-03-13
+
+Packaging automation was updated.
+
+## [0.2.1] - 2025-03-13
+
+Valid tests were moved within the package itself.
+
 ## [0.2.0] - 2025-03-12
 
 Library was restructured to prioritize string-based validation prompts for the MCP use case.
