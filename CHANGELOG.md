@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0] - 2025-03-19
+
+- Renames `templates` as `examples. This is the primary reason for the minor version release.
+- Restructures tests to leave only `examples` within the package, not the tests or invalid cases.
+- Reinstates CLI as a local testing tool, as this makes updating validation when working with MCP a smoother process instead of rewriting/committing a `test.py` file. This adds but does not change previous behavior. Also adds an `examples` command to list, and an `--example` option flag to validate built-in examples
+- Updates missing items in the CHANGELOG
+
 ## [0.3.1] - 2025-03-13
 
 Multiple small changes made ahead of internal demo:
