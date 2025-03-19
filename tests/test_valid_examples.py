@@ -30,19 +30,22 @@ def get_all_upsun_config_paths(directory):
 def test_valid_upsun_examples(config_path):
     """Test that all .upsun/config.yaml files are valid when validated as strings."""
     yaml_content = load_yaml_file(config_path)
-    
-    if "directus" in config_path:
-        with pytest.raises(ValidationError):
-            is_valid, message = validate_string(yaml_content)
-            # print(is_valid)
-            # print(message)
-            #         with pytest.raises(DuplicateKeyError):
-            # # with pytest.raises(DuplicateKeyError, match=msg):
-            #     validate_upsun_config(yaml_files)
-    else:
-        is_valid, message = validate_string(yaml_content)
-        assert is_valid, f"Expected valid but got error: {message} for file {config_path}"
-        assert "✔ No errors found. YAML is valid" in message
+    is_valid, message = validate_string(yaml_content)
+    assert is_valid, f"Expected valid but got error: {message} for file {config_path}"
+    assert "✔ No errors found. YAML is valid" in message
+
+    # if "directus" in config_path:
+    #     with pytest.raises(ValidationError):
+    #         is_valid, message = validate_string(yaml_content)
+    #         # print(is_valid)
+    #         # print(message)
+    #         #         with pytest.raises(DuplicateKeyError):
+    #         # # with pytest.raises(DuplicateKeyError, match=msg):
+    #         #     validate_upsun_config(yaml_files)
+    # else:
+    #     is_valid, message = validate_string(yaml_content)
+    #     assert is_valid, f"Expected valid but got error: {message} for file {config_path}"
+    #     assert "✔ No errors found. YAML is valid" in message
 
 def test_get_available_example_names():
     """Test that get_available_example_names returns a non-empty list."""
