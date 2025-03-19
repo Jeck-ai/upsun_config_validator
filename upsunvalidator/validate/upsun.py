@@ -13,7 +13,8 @@ from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
 from upsunvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
 from upsunvalidator.validate.extensions import validate_php_extensions
 
-from jsonschema import ValidationError
+# from jsonschema import ValidationError
+from upsunvalidator.validate.errors import ValidationError
 
 def validate_upsun_config_string(config_yaml_content):
     """Validate a string containing Upsun configuration in YAML format.
