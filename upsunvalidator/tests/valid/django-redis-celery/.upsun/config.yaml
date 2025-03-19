@@ -1,0 +1,75 @@
+applications:
+  uploader:
+    source:
+      root: "/"
+
+    type: "python:3.12"
+
+    relationships:
+      postgresql:
+      redis:
+
+    mounts:
+      "media":
+        source: "storage"
+        source_path: "media"
+
+    web:
+      commands:
+        start: "gunicorn  -b unix:$SOCKET file_uploader.wsgi --log-file -"
+      upstream:
+        socket_family: unix
+      locations:
+        "/":
+          passthru: true
+
+        "/static":
+          allow: true
+          expires: "1h"
+          root: "static_root"
+
+        "/media":
+          allow: true
+          expires: "1h"
+          root: "media"
+
+    variables:
+      env:
+        N_PREFIX: "/app/.global"
+
+    build:
+      flavor: none
+
+    hooks:
+      build: |
+        set -eux
+        pip install -r requirements.txt
+
+      deploy: |
+        set -eux
+        python manage.py migrate
+
+    workers:
+      queue:
+        mounts:
+          "media":
+            source: "storage"
+            source_path: "media"
+            service: "uploader"
+        commands:
+          start: |
+            celery -A file_uploader worker -B --loglevel=debug
+
+services:
+  postgresql:
+    type: postgresql:15
+  redis:
+    type: redis:7.0
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "uploader:http"
+  "https://www.{default}":
+    type: redirect
+    to: "https://{default}/"

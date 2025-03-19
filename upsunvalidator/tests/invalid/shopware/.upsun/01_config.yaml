@@ -1,0 +1,190 @@
+applications:
+  app:
+    build:
+      flavor: none
+    crons:
+      scheduler:
+        cmd: APP_CACHE_DIR=/app/localCache php bin/console scheduled-task:run --no-wait
+        spec: '*/5 * * * *'
+    dependencies:
+      php:
+        composer/composer: '2.8'
+    hooks:
+      build: 'set -e
+
+        echo "Installing Node ${NODE_VERSION} and shopware-cli ${SHOPWARE_CLI_VERSION}"
+
+
+        mkdir -p /tmp/tools
+
+
+        curl -qL -s -o node.tar.xz "https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz"
+
+        tar xf node.tar.xz -C /tmp/tools --strip-components=1
+
+        curl -qL -s -o shopware-cli.tar.gz https://github.com/shopware/shopware-cli/releases/download/${SHOPWARE_CLI_VERSION}/shopware-cli_Linux_x86_64.tar.gz
+
+        tar xf shopware-cli.tar.gz -C /tmp/tools shopware-cli
+
+        mv /tmp/tools/shopware-cli /tmp/tools/bin
+
+
+        rm node.tar.xz shopware-cli.tar.gz
+
+
+        export PATH="/tmp/tools/bin:$PATH"
+
+
+        export APP_CACHE_DIR=$PLATFORM_APP_DIR/localCache
+
+        export SHOPWARE_SKIP_ASSET_INSTALL_CACHE_INVALIDATION=1
+
+
+        shopware-cli project ci .
+
+
+        # Moving files of the mounts to avoid warnings
+
+        mv $APP_CACHE_DIR ./RO-localCache
+
+        mv ./var ./RO-var
+
+        '
+      deploy: "set -e\n\necho \"Syncing files created during the build in the mounts\"\
+        \nrsync -av --delete \"${PLATFORM_APP_DIR}/RO-localCache/\" \"${APP_CACHE_DIR}/\"\
+        \nrsync -av \"${PLATFORM_APP_DIR}/RO-var/\" \"${PLATFORM_APP_DIR}/var/\"\n\
+        \necho \"Create Dompdf working directories and sync fonts from the vendor\
+        \ folder\"\nif [ ! -d \"${PLATFORM_APP_DIR}/var/dompdf/tempDir\" ]; then\n\
+        \    mkdir -p \"${PLATFORM_APP_DIR}/var/dompdf/tempDir\"\nfi\nif [ ! -d \"\
+        ${PLATFORM_APP_DIR}/var/dompdf/fontCache\" ]; then\n    mkdir -p \"${PLATFORM_APP_DIR}/var/dompdf/fontCache\"\
+        \nfi\nrsync -av \"${PLATFORM_APP_DIR}/vendor/dompdf/dompdf/lib/fonts\" \"\
+        ${PLATFORM_APP_DIR}/var/dompdf/fontDir\"\n\nphp vendor/bin/shopware-deployment-helper\
+        \ run --skip-asset-install --skip-theme-compile\n\nif [ \"$PLATFORM_ENVIRONMENT_TYPE\"\
+        \ != production ]; then\n    echo \"===================================================\"\
+        \n    echo \"UPDATE SALES CHANNEL DOMAIN IF ENVIRONMENT TYPE IS NOT PRODUCTION\"\
+        \n    echo \"===================================================\"\n\n   \
+        \ export FRONTEND_URL=`echo $PLATFORM_ROUTES | base64 --decode | jq -r 'to_entries[]\
+        \ | select(.value.id==\"shopware\") | .key'`\n    export FRONTEND_DOMAIN=`php\
+        \ -r 'echo parse_url($_SERVER[\"FRONTEND_URL\"], PHP_URL_HOST);'`\n    bin/console\
+        \ sales-channel:update:domain \"$FRONTEND_DOMAIN\"\nfi\n"
+      post_deploy: 'set -e
+
+
+        php bin/console theme:compile --sync
+
+        '
+    mounts:
+      /files:
+        service: fileshare
+        source: service
+        source_path: files
+      /localCache:
+        source: storage
+        source_path: localCache
+      /public/media:
+        service: fileshare
+        source: service
+        source_path: public/media
+      /public/sitemap:
+        service: fileshare
+        source: service
+        source_path: public/sitemap
+      /public/theme:
+        service: fileshare
+        source: service
+        source_path: public/theme
+      /public/thumbnail:
+        service: fileshare
+        source: service
+        source_path: public/thumbnail
+      /var:
+        service: fileshare
+        source: service
+        source_path: var
+    relationships:
+      database: db:mysql
+      rabbitmqqueue: rabbitmq:rabbitmq
+      rediscache: cacheredis:redis
+    runtime:
+      extensions:
+      - ctype
+      - dom
+      - iconv
+      - mbstring
+      - fileinfo
+      - intl
+      - redis
+      - sodium
+      - amqp
+    type:
+    - python
+    - '3.9'
+    variables:
+      env:
+        APP_ENV: prod
+        COMPOSER_ROOT_VERSION: 1.0.0
+        NODE_VERSION: v20.18.0
+        SHOPWARE_CLI_VERSION: 0.4.62
+        SHOPWARE_ES_ENABLED: 0
+        SHOPWARE_ES_INDEXING_ENABLED: 0
+        SHOPWARE_ES_INDEX_PREFIX: sw6
+        SHOPWARE_HTTP_CACHE_ENABLED: 1
+        SHOPWARE_SKIP_WEBINSTALLER: 1
+      php:
+        memory_limit: 512M
+        opcache.enable_file_override: 1
+        opcache.interned_strings_buffer: 20
+        opcache.max_accelerated_files: 20000
+        opcache.memory_consumption: 128M
+        opcache.validate_timestamps: 0
+        post_max_size: 32M
+        realpath_cache_ttl: 3600
+        upload_max_filesize: 32M
+        zend.assertions: -1
+        zend.detect_unicode: 0
+    web:
+      locations:
+        /:
+          expires: 24h
+          passthru: /index.php
+          root: public
+          rules:
+            \.(css|js|gif|jpe?g|png|ttf|eot|woff2?|otf|cast|mp4|json|yaml|ico|svg?|cast|mp4|json|yaml|svg?|ttf)$:
+              expires: 4w
+    workers:
+      queue:
+        commands:
+          start: APP_CACHE_DIR=/app/localCache bin/console messenger:consume async
+            failed --memory-limit=$(cat /run/config.json | jq .info.limits.memory)M
+            --time-limit=295
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://{default}/:
+    cache:
+      cookies:
+      - /^ss?ess/
+      enabled: true
+    id: shopware
+    type: upstream
+    upstream: app:http
+services:
+  cacheredis:
+    configuration:
+      maxmemory_policy: volatile-lfu
+    type: redis:7.0
+  db:
+    type: mariadb:11.2
+  fileshare:
+    type: network-storage:2.0
+  rabbitmq:
+    type: rabbitmq:3.12
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

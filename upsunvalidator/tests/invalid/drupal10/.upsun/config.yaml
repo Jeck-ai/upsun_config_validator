@@ -1,0 +1,117 @@
+applications:
+  drupal:
+    source:
+      root: "/"
+    type: "php:8.2"
+    relationships:
+      mariadb:
+      redis:
+    mounts:
+        '/web/sites/default/files':
+            source: storage
+            source_path: 'files'
+        '/tmp':
+            source: local
+            source_path: 'tmp'
+        '/private':
+            source: local
+            source_path: 'private'
+        '/.drush':
+            source: local
+            source_path: 'drush'
+        '/drush-backups':
+            source: local
+            source_path: 'drush-backups'
+        '/.console':
+            source: local
+            source_path: 'console'
+        '/config/sync':
+            source: local
+            source_path: 'config'
+
+    web:
+        locations:
+            '/':
+                root: 'web'
+                expires: 5m
+                passthru: '/index.php'
+                allow: false
+                rules:
+                    '\.(avif|webp|jpe?g|png|gif|svgz?|css|js|map|ico|bmp|eot|woff2?|otf|ttf)$':
+                        allow: true
+                    '^/robots\.txt$':
+                        allow: true
+                    '^/sitemap\.xml$':
+                        allow: true
+                    '^/sites/sites\.php$':
+                        scripts: false
+                    '^/sites/[^/]+/settings.*?\.php$':
+                        scripts: false
+            '/sites/default/files':
+                allow: true
+                expires: 5m
+                passthru: '/index.php'
+                root: 'web/sites/default/files'
+                scripts: false
+
+                rules:
+                    '^/sites/default/files/(css|js)':
+                        expires: 2w
+          
+    variables:
+      env:
+        N_PREFIX: "/app/.global"
+        
+    build:
+      flavor: none
+
+    dependencies:
+      nodejs:
+        n: "*"
+        yarn: "^1.22.0"
+      php:
+        composer/composer: "^2"
+
+    runtime:
+        extensions:
+            - redis
+            - sodium
+            - apcu
+            - blackfire        
+    hooks:
+      build: |
+        set -eux
+        composer --no-ansi --no-interaction install --no-progress --prefer-dist --optimize-autoloader --no-dev
+        # use n to get node
+        n auto || n lts
+        # reset hash table of shell so that node is on path
+        hash -r
+        yarn
+      deploy: |
+        set -eux
+        # echo 'Put your deploy command here'
+        
+    crons:
+        drupal:
+            spec: '*/19 * * * *'
+            commands: 
+                start: 'cd web ; drush core-cron'
+
+services:
+  mariadb:
+    type: mariadb:11.0 
+  redis:
+    type: redis:7.2  
+
+routes:
+  "https://{default}/":
+      type: upstream
+      upstream: "drupal:http"
+      cache:
+        enabled: true
+
+        cookies: ['/^SS?ESS/', '/^Drupal.visitor/']
+
+  "https://www.{default}/":
+      type: redirect
+      to: "https://{default}/"

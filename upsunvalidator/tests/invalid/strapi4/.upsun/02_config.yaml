@@ -1,0 +1,60 @@
+routes:
+  https://www.{default}/:
+    type: upstream
+    upstream: app:http
+  https://{default}/:
+    to: https://www.{default}/
+    type: redirect
+services:
+  dbpostgres:
+    applications:
+      app:
+        build:
+          flavor: none
+        dependencies:
+          nodejs:
+            yarn: 1.22.5
+        hooks:
+          build: '# Download dependencies and build Strapi.
+
+            yarn --frozen-lockfile
+
+            yarn build
+
+            '
+        mounts:
+          .tmp:
+            source: storage
+            source_path: app
+          /.cache:
+            source: storage
+            source_path: cache
+          database:
+            source: storage
+            source_path: database
+          extensions:
+            source: storage
+            source_path: extensions
+          public/uploads:
+            source: storage
+            source_path: uploads
+        relationships:
+          postgresdatabase: dbpostgres:postgresql
+        source:
+          operations:
+            auto-update:
+              command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+                | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+                '
+          root: /
+        type: nodejs:18
+        variables:
+          env:
+            NODE_ENV: production
+        web:
+          commands:
+            start: 'yarn start
+
+              '
+    type: postgresql:12

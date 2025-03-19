@@ -4,7 +4,7 @@ import json
 
 
 # Handle service versions.
-# @todo: GH Action: periodically grab these versions from platformsh/platformsh-docs.
+# @todo: GH Action: periodically update supported versions
 registryLocation = "{0}/{1}".format(os.path.dirname(os.path.abspath(__file__)), "/data/services/registry.json")
 SERVICE_VERSIONS = {}
 with open(registryLocation) as json_data:

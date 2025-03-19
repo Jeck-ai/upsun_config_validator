@@ -1,0 +1,107 @@
+applications:
+  app:
+    build:
+      flavor: composer
+    crons:
+      typo3:
+        cmd: vendor/bin/typo3 scheduler:run
+        spec: '*/5 * * * *'
+    dependencies:
+      php:
+        composer/composer: ^2
+    hooks:
+      build: '# Exit hook immediately if a command exits with a non-zero status.
+
+        set -e
+
+
+        bash ./.platform-scripts/build.sh
+
+        '
+      deploy: '# Exit hook immediately if a command exits with a non-zero status.
+
+        set -e
+
+
+        bash ./.platform-scripts/deploy.sh
+
+        '
+    mounts:
+      config:
+        source: storage
+        source_path: config
+      public/fileadmin:
+        source: storage
+        source_path: fileadmin
+      public/typo3temp:
+        source: storage
+        source_path: typo3temp
+      var:
+        source: storage
+        source_path: var
+    relationships:
+      database: mdb:mysql
+      rediscache: cache:redis
+    routes:
+      https://{default}/:
+        cache:
+          cookies:
+          - be_typo_user
+          - fe_typo_user
+          - PHPSESSID
+          - Typo3InstallTool
+          enabled: true
+        id: main
+        type: upstream
+        upstream: app:http
+    runtime:
+      extensions:
+      - redis
+    source:
+      root: /
+    type: php:8.1
+    variables:
+      env:
+        TYPO3_ENABLE_INSTALL_TOOL: 'true'
+    web:
+      locations:
+        /:
+          allow: false
+          index:
+          - index.php
+          passthru: /index.php
+          root: public
+          rules:
+            \.(jpe?g|png|gif|svgz?|css|js|map|ico|bmp|eot|woff2?|otf|ttf)$:
+              allow: true
+            ^/robots\.txt$:
+              allow: true
+            ^/sitemap\.xml$:
+              allow: true
+        /fileadmin:
+          allow: true
+          headers:
+            Content-Security-Policy: default-src 'self'; script-src 'none'; style-src
+              'none'; object-src 'none';
+          passthru: /index.php
+          root: public/fileadmin
+          scripts: false
+        /typo3/:
+          allow: true
+          passthru: /typo3/index.php
+          root: public/typo3
+          scripts: true
+        /typo3conf/AdditionalConfiguration.php:
+          allow: false
+        /typo3conf/LocalConfiguration.php:
+          allow: false
+        /typo3temp/assets:
+          allow: true
+          passthru: /index.php
+          root: public/typo3temp/assets
+          scripts: false
+services:
+  cache:
+    type: redis:6.2
+  mdb:
+    type: mysql:10.4

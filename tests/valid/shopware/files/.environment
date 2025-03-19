@@ -1,1 +1,0 @@
-export APP_CACHE_DIR=$PLATFORM_APP_DIR/localCache

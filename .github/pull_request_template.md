@@ -26,8 +26,8 @@ Updates affect:
 - [ ] Issue and pull request templates
 - [ ] Packaging, publishing, and releases
 - [ ] Tests
-- [ ] Examples (`tests/valid`)
-- [ ] Failing examples (`tests/invalid_*`)
+- [ ] Examples (`upsunvalidator/tests/valid`)
+- [ ] Failing examples (`upsunvalidator/tests/invalid_*`)
 - [ ] Documentation & docstrings
 - [ ] Changelog
 - [ ] Schema updates & additions

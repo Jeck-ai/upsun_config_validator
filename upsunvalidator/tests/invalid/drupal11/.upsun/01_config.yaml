@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+applications:
+  drupal:
+    build:
+      flavor: composer
+    crons:
+      drupal:
+        commands:
+          start: cd web ; drush core-cron
+        spec: '*/19 * * * *'
+    dependencies:
+      php:
+        composer/composer: ^2.7
+    hooks:
+      build: 'set -e
+
+        '
+      deploy: 'set -e
+
+        php ./drush/platformsh_generate_drush_yml.php
+
+        # if drupal is installed, will call the following drush commands:
+
+        #   - `cache-rebuild`
+
+        #   - `updatedb`
+
+        #   - and if config files are present, `config-import`
+
+        cd web
+
+        bash $PLATFORM_APP_DIR/drush/platformsh_deploy_drupal.sh
+
+        '
+    mounts:
+      /.drush:
+        source: storage
+        source_path: drush
+      /drush-backups:
+        source: storage
+        source_path: drush-backups
+      /private:
+        source: storage
+        source_path: private
+      /tmp:
+        source: storage
+        source_path: tmp
+      /web/sites/default/files:
+        source: storage
+        source_path: files
+    relationships:
+      database: db:mysql
+      redis: cache:redis
+    runtime:
+      extensions:
+      - redis
+      - sodium
+      - apcu
+      - blackfire
+    source:
+      root: /
+    type: php:8.3
+    web:
+      locations:
+        /:
+          allow: false
+          expires: 5m
+          passthru: /index.php
+          root: web
+          rules:
+            \.(avif|webp|jpe?g|png|gif|svgz?|css|js|map|ico|bmp|eot|woff2?|otf|ttf)$:
+              allow: true
+            ^/robots\.txt$:
+              allow: true
+            ^/sitemap\.xml$:
+              allow: true
+            ^/sites/[^/]+/settings.*?\.php$:
+              scripts: false
+            ^/sites/sites\.php$:
+              scripts: false
+        /sites/default/files:
+          allow: true
+          expires: 5m
+          passthru: /index.php
+          root: web/sites/default/files
+          rules:
+            ^/sites/default/files/(css|js):
+              expires: 2w
+          scripts: false
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    cache:
+      cookies:
+      - /^SS?ESS/
+      - /^Drupal.visitor/
+      enabled: true
+    type: upstream
+    upstream: drupal:http
+services:
+  cache:
+    type: redis:7.2
+  db:
+    type: mariadb:10.6
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform
+variables:
+  env:
+    APP_ENV: prod
+    DEBUG: false

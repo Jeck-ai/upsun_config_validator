@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+applications:
+  app:
+    build:
+      flavor: none
+    dependencies:
+      nodejs:
+        yarn: 1.22.5
+    hooks:
+      build: 'yarn
+
+        yarn build
+
+        '
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: nodejs:16
+    web:
+      locations:
+        /:
+          allow: true
+          index:
+          - index.html
+          root: public
+          scripts: false
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+routes:
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

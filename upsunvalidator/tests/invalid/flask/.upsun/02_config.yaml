@@ -1,0 +1,76 @@
+applications:
+  flask:
+    hooks:
+      build: "set -e\n# export Flask app for Blackfire\nexport FLASK_APP=server.py\n\
+        # Setup pip.\npython -m pip install pip==$PIP_VERSION\n############### PIPENV\
+        \ ###################\nif [ \"$PACKAGE_MANAGER\" = \"pipenv\" ]; then\n  \
+        \  # Install pipenv.\n    pip install pipenv==$PIPENV_VERSION_BUILD\n    #\
+        \ Check and verify the lockfile. Track failures.\n    pipenv check && pipenv\
+        \ verify && pipenv --support > pipenv.support\n    # Install dependencies\
+        \ to the virtual environment.\n    VENV_VERSION=$(python3 -c 'import sys;\
+        \ print(\".\".join(map(str, sys.version_info[:3])))')\n    pipenv --python\
+        \ $VENV_VERSION\n    pipenv install --deploy\n############### POETRY ###################\n\
+        elif [ \"$PACKAGE_MANAGER\" = \"poetry\" ]; then\n    # Install Poetry.\n\
+        \    POETRY_INSTALLER='https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py'\n\
+        \    curl -sSL $POETRY_INSTALLER | POETRY_VERSION=$POETRY_VERSION python -\n\
+        \    # Check lockfile and install dependencies.\n    poetry env use system\n\
+        \    poetry check\n    poetry install\nfi\n"
+    relationships:
+      database: db:mysql
+      rediscache: cache:redis
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: python:3.9
+    variables:
+      env:
+        PACKAGE_MANAGER: poetry
+        PIPENV_VERSION_BUILD: 2022.4.21
+        PIP_VERSION: 22.0.4
+        POETRY_VERSION: 1.1.13
+        POETRY_VIRTUALENVS_CREATE: false
+        POETRY_VIRTUALENVS_IN_PROJECT: true
+    web:
+      commands:
+        start: blackfire-python flask run -p $PORT
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+provider:
+  aws:
+    region: us-west-2
+resource:
+  aws_instance:
+    app_server:
+      ami: ami-830c94e3
+      instance_type: t2.micro
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: flask:http
+services:
+  cache:
+    type: redis:6.2
+  db:
+    type: mariadb:10.4
+terraform:
+  required_providers:
+    aws:
+      source: hashicorp/aws
+      version: ~> 3.0
+version: '3.8'
+volumes:
+  db_data:
+    driver: local
+  logs:
+    driver: local

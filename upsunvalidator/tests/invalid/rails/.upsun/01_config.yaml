@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+applications:
+  app:
+    dependencies:
+      nodejs:
+        yarn: '*'
+    hooks:
+      build: "set -e\n\necho \"Installing NVM $NVM_VERSION\"\nunset NPM_CONFIG_PREFIX\n\
+        export NVM_DIR=\"$PLATFORM_APP_DIR/.nvm\"\n# install.sh will automatically\
+        \ install NodeJS based on the presence of $NODE_VERSION\ncurl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh\
+        \ | bash\n[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\"\n\n# we install\
+        \ the bundled bundler version and fallback to a default (in env vars above)\n\
+        export BUNDLER_VERSION=\"$(grep -A 1 \"BUNDLED WITH\" Gemfile.lock | tail\
+        \ -n 1)\" || $DEFAULT_BUNDLER_VERSION\necho \"Install bundler $BUNDLER_VERSION\"\
+        \ngem install --no-document bundler -v $BUNDLER_VERSION\n\necho \"Installing\
+        \ gems\"\n# We copy the bundle directory to the Platform.sh cache directory\
+        \ for\n# safe keeping, then restore from there on the next build. That allows\n\
+        # bundler to skip downloading code it doesn't need to.\n[ -d \"$PLATFORM_CACHE_DIR/bundle\"\
+        \ ] && \\\n  rsync -az --delete \"$PLATFORM_CACHE_DIR/bundle/\" vendor/bundle/\n\
+        mkdir -p \"$PLATFORM_CACHE_DIR/bundle\"\nbundle install\n# synchronize updated\
+        \ cache for next build\nrsync -az --delete vendor/bundle/ \"$PLATFORM_CACHE_DIR/bundle/\"\
+        \n\n# precompile assets\necho \"Precompiling assets\"\n# We copy the webpacker\
+        \ directory to the Platform.sh cache directory for\n# safe keeping, then restore\
+        \ from there on the next build. That allows\n# bundler to skip downloading\
+        \ code it doesn't need to.\nmkdir -p \"$PLATFORM_CACHE_DIR/webpacker\"\nmkdir\
+        \ -p \"$RAILS_TMP/cache/webpacker\"\n[ -d \"$PLATFORM_CACHE_DIR/webpacker\"\
+        \ ] && \\\n  rsync -az --delete \"$PLATFORM_CACHE_DIR/webpacker/\" $RAILS_TMP/cache/webpacker/\n\
+        # We dont need secret here https://github.com/rails/rails/issues/32947\nSECRET_KEY_BASE=1\
+        \ bundle exec rails assets:precompile\nrsync -az --delete $RAILS_TMP/cache/webpacker/\
+        \ \"$PLATFORM_CACHE_DIR/webpacker/\"\n"
+      deploy: 'bundle exec rails db:migrate
+
+        '
+    mounts:
+      /log:
+        source: storage
+        source_path: log
+      /storage:
+        source: storage
+        source_path: storage
+      /tmp:
+        source: storage
+        source_path: tmp
+    relationships:
+      database: db:postgresql
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    variables:
+      env:
+        BUNDLE_CACHE_ALL: '1'
+        BUNDLE_CLEAN: '1'
+        BUNDLE_DEPLOYMENT: '1'
+        BUNDLE_ERROR_ON_STDERR: '1'
+        BUNDLE_WITHOUT: development:test
+        DEFAULT_BUNDLER_VERSION: 2.2.26
+        EXECJS_RUNTIME: Node
+        NODE_ENV: production
+        NODE_VERSION: v14.17.6
+        NVM_VERSION: v0.38.0
+        RACK_ENV: production
+        RAILS_ENV: production
+        RAILS_LOG_TO_STDOUT: '1'
+        RAILS_TMP: /tmp
+    web:
+      commands:
+        start: bundle exec unicorn -l $SOCKET
+      upstream:
+        socket_family: unix
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+routes:
+  https://{default}:
+    type: upstream
+    upstream: app:http
+services:
+  db:
+    type: postgresql:13
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform

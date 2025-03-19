@@ -1,0 +1,59 @@
+another_invalid:
+  another:
+  - 1
+  - 2
+  - 3
+  nested: value
+apiVersion: apps/v1
+applications:
+  app:
+    dependencies:
+      python:
+        pipenv: 2018.10.13
+    hooks:
+      build: 'pipenv install --system --deploy
+
+        '
+    relationships:
+      database: db:mysql
+      redis: cache:redis
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    type: python:3.8
+    web:
+      commands:
+        start: python app.py
+invalid_element: This shouldn't be here
+kind: Deployment
+metadata:
+  labels:
+    app: platform
+  name: platform-app
+random_data:
+- name: item1
+  value: 123
+- name: item2
+  value: string
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    type: upstream
+    upstream: app:http
+services:
+  cache:
+    type: redis:6.2
+  db:
+    type: mariadb:10.4
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: platform

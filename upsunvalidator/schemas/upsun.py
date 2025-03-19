@@ -1,11 +1,9 @@
 import os
 import json
 
-UPSUN_PROPER_NAME="Upsun"
-
 # UPSUN SCHEMA
-upsunSchemaFile = "{0}/{1}".format(os.path.dirname(os.path.abspath(__file__)), "/data/providers/upsun.json")
-with open(upsunSchemaFile) as json_data:
+schema_file = "{0}/{1}".format(os.path.dirname(os.path.abspath(__file__)), "/data/providers/upsun.json")
+with open(schema_file) as json_data:
     UPSUN_SCHEMA = json.load(json_data)
 
     # @todo: Some spec overrides, which will need investigation

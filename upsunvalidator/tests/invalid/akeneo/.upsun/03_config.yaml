@@ -1,0 +1,167 @@
+applications:
+  akeneo:
+    build:
+      flavor: none
+    crons:
+      aggregate:
+        commands:
+          start: php bin/console pim:volume:aggregate
+        spec: 30 4 * * *
+      purge_jobs:
+        commands:
+          start: php bin/console akeneo:batch:purge-job-execution
+        spec: 20 0 1 * *
+      purge_versioning:
+        commands:
+          start: "php bin/console pim:versioning:purge \u2013more-than-days 90"
+        spec: 30 2 * * *
+      refresh:
+        commands:
+          start: php bin/console pim:versioning:refresh
+        spec: 30 1 * * *
+      update_data:
+        commands:
+          start: php bin/console akeneo:connectivity-audit:update-data
+        spec: 1 * * * *
+    dependencies:
+      php:
+        composer/composer: ^2
+    hooks:
+      build: 'set -e
+
+
+        # Install composer dependencies.
+
+        composer install
+
+
+        # Install n to use newer version of node.
+
+        export N_PREFIX=$HOME/.n
+
+        export PATH=$N_PREFIX/bin:$PATH
+
+        curl -fsS https://raw.githubusercontent.com/platformsh/snippets/main/src/install_node.sh
+        | { bash /dev/fd/3 -v $NODE_VERSION -y; } 3<&0
+
+
+        echo "Installing Node dependencies"
+
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 corepack yarn install
+
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 corepack yarn packages:build
+
+
+        echo "Installing assets"
+
+        php bin/console pim:installer:assets --symlink --clean -vvv
+
+        corepack yarn run less
+
+        corepack yarn update-extensions
+
+
+        echo "Running webpack"
+
+        corepack yarn run webpack
+
+        '
+      deploy: "set -e\n\necho \"Warming cache\"\nrm -rf var/cache/*\nphp bin/console\
+        \ cache:warmup\n\nSTARTER_TRACKING=installer/$AKENEO_STARTER.installed\nCATALOG_PATH=vendor/akeneo/pim-community-dev/src/Akeneo/Platform/Bundle/InstallerBundle/Resources/fixtures\n\
+        \n# run installer if no lockfile exists\nif [ ! -f $STARTER_TRACKING ]; then\n\
+        \n    # Clear previous tracking files in case trying multiple.\n    rm -rf\
+        \ installer/*\n\n    # minimal catalog + fixtures.\n    if [ \"$AKENEO_STARTER\"\
+        \ = minimal ]; then\n        echo \"Running the installer: $AKENEO_STARTER\
+        \ catalog + fixtures.\"\n        php bin/console pim:installer:db --env=$APP_ENV\
+        \ --catalog=$CATALOG_PATH/$AKENEO_STARTER\n        # Create the admin user\
+        \ (admin/admin). Change immediately.\n        php bin/console pim:user:create\
+        \ -n --admin admin admin admin@example.com Admin Istrator $APP_DEFAULT_LOCALE\n\
+        \        php bin/console cache:clear\n        touch $STARTER_TRACKING\n\n\
+        \    # icecat_demo_dev catalog + fixtures.\n    elif [ \"$AKENEO_STARTER\"\
+        \ = icecat_demo_dev ]; then\n        echo \"Running the installer: $AKENEO_STARTER\
+        \ catalog + fixtures.\"\n        php bin/console pim:installer:db --env=$APP_ENV\
+        \ --catalog=$CATALOG_PATH/$AKENEO_STARTER\n        # Note: no admin user is\
+        \ created, since `icecat_demo_dev` creates on automatically (admin/admin).\
+        \ Change immediately.\n        php bin/console cache:clear\n        touch\
+        \ $STARTER_TRACKING\n\n    else\n        echo \"No profile given. Skipping\
+        \ installation.\"\n    fi\nelse\n    echo \"Akeneo already installed. Skipping.\"\
+        \nfi\n"
+    mounts:
+      config/secrets:
+        source: storage
+        source_path: config/secrets
+      installer:
+        source: storage
+        source_path: installer
+      public/media:
+        source: storage
+        source_path: public/media
+      var:
+        source: storage
+        source_path: var
+      var/file_storage:
+        source: storage
+        source_path: var/file_storage
+      var/file_storage/jobs:
+        service: jobs
+        source: service
+        source_path: var/file_storage/jobs
+      web:
+        source: storage
+        source_path: web
+    relationships:
+      database: db:mysql
+      essearch: search:elasticsearch
+    runtime:
+      extensions:
+      - apcu
+      - imagick
+      - memcached
+      - intl
+      - redis
+      - sodium
+    source:
+      operations:
+        auto-update:
+          command: 'curl -fsS https://raw.githubusercontent.com/platformsh/source-operations/main/setup.sh
+            | { bash /dev/fd/3 sop-autoupdate; } 3<&0
+
+            '
+      root: /
+    variables:
+      env:
+        AKENEO_STARTER: minimal
+        APP_DEBUG: 0
+        APP_DEFAULT_LOCALE: en_US
+        APP_ENV: prod
+        APP_PRODUCT_AND_PRODUCT_MODEL_INDEX_NAME: akeneo_pim_product_and_product_model
+        NODE_VERSION: v14.19.0
+      php:
+        apc.enable_cli: 1
+    web:
+      locations:
+        /:
+          passthru: /index.php
+          root: public
+    workers:
+      queue:
+        commands:
+          start: 'php /app/bin/console akeneo:batch:job-queue-consumer-daemon
+
+            '
+routes:
+  https://www.{default}/:
+    to: https://{default}/
+    type: redirect
+  https://{default}/:
+    cache:
+      enabled: false
+    type: upstream
+    upstream: akeneo:http
+services:
+  db:
+    type: oracle-mysql:8.0
+  jobs:
+    type: network-storage:2.0
+  search:
+    type: elasticsearch:7.17

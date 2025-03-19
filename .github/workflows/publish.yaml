@@ -10,20 +10,25 @@ on:
 
 env:
     PYTHON_VERSION: 3.13
-    # Flit.
-    FLIT_USERNAME: __token__
-    FLIT_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+    # PyPI token
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
 
 jobs:
     publish:
-        name: "Publish to PYPI using Flit"
+        name: "Publish to PyPI using setuptools"
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@v4
+            with:
+              fetch-depth: 0  # Required for setuptools_scm to detect tags/version
           - name: Setup Python 3.13
             uses: actions/setup-python@v5
             with:
                 python-version: ${{ env.PYTHON_VERSION }}   
-          - run: pip install flit
-          - run: flit build
-          - run: flit publish
+          - name: Install build dependencies
+            run: pip install setuptools setuptools_scm build twine
+          - name: Build package
+            run: python -m build
+          - name: Publish to PyPI
+            run: python -m twine upload dist/*
