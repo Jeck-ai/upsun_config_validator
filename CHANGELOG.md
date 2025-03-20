@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.2] - 2025-03-19
+## [0.3.2] - 2025-03-20
 
 - Renames `templates` as `examples in comments and method names. Previous methods exist as wrappers only, but will be deprecated in a future release.
 - Restructures tests to leave only `examples` within the package, not the tests or invalid cases.
