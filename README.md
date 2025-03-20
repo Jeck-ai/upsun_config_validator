@@ -80,7 +80,10 @@ pip install --upgrade upsunvalidator
 
 ## Usage
 
-### Using in your code
+The primary use case of this library is to allow users to import the validator library into their applications -- namely MCP server tools -- to validate configuration strings and/or built-in examples.
+A secondary use case, primarily to simplify local testing, is a built-in CLI utility for validating strings, built-in examples, and file paths directly from the command line.
+
+### Importing the validator into your code
 
 ```python
 from upsunvalidator import validate, validate_string
@@ -140,31 +143,52 @@ success, message = validate_string(invalid_type_config)
 print(message)  # Will show error about type mismatch
 ```
 
-### Using the template library
+### Using the built-in examples library
 
 ```python
-from upsunvalidator import get_available_template_names, get_template_config, get_template_config_with_info
+from upsunvalidator import get_available_example_names, get_example_config, get_example_config_with_info
 
 # Get list of available template names
-template_names = get_available_template_names()
-print(template_names)  # ['akeneo', 'directus', 'django4', 'drupal11', 'express', ...]
+example_names = get_available_example_names()
+print(example_names)  # ['akeneo', 'directus', 'django4', 'drupal11', 'express', ...]
 
 # Get a specific template's config.yaml content
-wordpress_config = get_template_config('wordpress-vanilla')
+wordpress_config = get_example_config('wordpress-vanilla')
 print(wordpress_config)  # YAML content as string
 
 # Get templates with descriptions for easier selection
-templates_info = get_template_config_with_info()
-for name, (description, _) in templates_info.items():
+example_info = get_example_config_with_info()
+for name, (description, _) in example_info.items():
     print(f"{name}: {description}")
 
 # Get and use a specific template
-laravel_config = get_template_config('laravel')
+laravel_config = get_example_config('laravel')
 if laravel_config:
     # Validate the template
     from upsunvalidator import validate_string
     success, message = validate_string(laravel_config)
     print(message)
+```
+
+### Running from the command line
+
+> [!IMPORTANT]  
+> This is not the primary use case for this tool, and exists mainly for development purposes supporting the use cases above.
+
+```bash
+# Validate a directory
+
+upsunvalidator validate --src $(pwd)
+
+# Validate a file
+
+upsunvalidator validate --file $(pwd)/.upsun/config.yaml
+
+# Validate string contents
+
+FILE_CONTENTS=$(cat .upsun/config.yaml)
+
+upsunvalidator validate --string $FILE_CONTENTS
 ```
 
 ## Testing

@@ -2,21 +2,26 @@ import yaml
 import ruamel.yaml
 from ruamel.yaml.constructor import DuplicateKeyError
 
-# import ruamel.yaml
-# from ruamel.yaml.constructor import DuplicateKeyError
-
-# import sys
-# sys.tracebacklimit=0
+import sys
+sys.tracebacklimit=0
 
 from jsonschema import validate
 
 from upsunvalidator.schemas.upsun import UPSUN_SCHEMA
 
-from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
-from upsunvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
+from upsunvalidator.utils.utils import (
+    load_yaml_file, 
+    flatten_validation_error
+)
+from upsunvalidator.validate.services import ( 
+    validate_service_version, 
+    validate_service_schema, 
+    validate_service_type, 
+    validate_service_version
+)
 from upsunvalidator.validate.extensions import validate_php_extensions
 
-from jsonschema import ValidationError
+from upsunvalidator.validate.errors import ValidationError, InvalidServiceVersionError
 
 def validate_upsun_config_string(config_yaml_content):
     """Validate a string containing Upsun configuration in YAML format.
@@ -103,7 +108,7 @@ def validate_upsun_config(yaml_files):
 
         return _validate_config(combined)
     else:
-        return ["✔ No errors found. YAML is valid.\n"]
+        return ["\n✔ No errors found. YAML is valid.\n"]
 
 
 def _check_data_types(config):
@@ -303,7 +308,7 @@ def _validate_config(config):
                 # Validate the runtime versions.
                 is_valid, error_message = validate_service_version(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise ValidationError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
+                    raise InvalidServiceVersionError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
                 # Validate PHP extensions if defined.
                 if "php" in app_config["type"]:
                     php_version = app_config["type"].split(":")[1]
@@ -339,4 +344,4 @@ def _validate_config(config):
                 if not is_valid:
                     raise ValidationError(f"\n\n✘ Error found in service '{service_name}':{error_message}")
 
-    return ["✔ No errors found. YAML is valid.\n"]
+    return ["\n✔ No errors found. YAML is valid.\n"]

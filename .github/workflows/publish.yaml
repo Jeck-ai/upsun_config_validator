@@ -1,5 +1,6 @@
 ---
 name: Publish (pypi)
+
 on:
     # Workflow will run when a release has been published for the package
     release:
@@ -30,5 +31,7 @@ jobs:
             run: pip install setuptools setuptools_scm build twine
           - name: Build package
             run: python -m build
+          - name: Get version
+            run: python -m setuptools_scm
           - name: Publish to PyPI
             run: python -m twine upload dist/*

@@ -26,7 +26,7 @@ Updates affect:
 - [ ] Issue and pull request templates
 - [ ] Packaging, publishing, and releases
 - [ ] Tests
-- [ ] Examples (`upsunvalidator/tests/valid`)
+- [ ] Examples (`upsunvalidator/examples`)
 - [ ] Failing examples (`upsunvalidator/tests/invalid_*`)
 - [ ] Documentation & docstrings
 - [ ] Changelog
@@ -41,7 +41,6 @@ Updates affect:
 
 - [ ] Opened and linked an issue to this pull request
 - [ ] Read through [`CONTRIBUTING.md`](../CONTRIBUTING.md)
-- [ ] Bumped the patch version in [`upsunvalidator/__init__.py`](../upsunvalidator/__init__.py)
 - [ ] Included an entry in the [`CHANGELOG.md`](../CHANGELOG.md) file for your change
 - [ ] Added documentation and/or docstrings describing your change
 - [ ] Run tests locally prior to review

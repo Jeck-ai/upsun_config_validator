@@ -1,0 +1,24 @@
+akeneo: Akeneo PIM (Product Information Management)
+directus: Directus headless CMS
+django4: Django 4 Python web framework
+drupal11: Drupal 11 CMS
+express: Express.js Node.js web application framework
+fastapi: FastAPI Python web framework
+flask: Flask Python microframework
+gatsby: Gatsby static site generator
+gatsby-wordpress: Gatsby with WordPress as a headless CMS
+laravel: Laravel PHP framework
+magentoce: Magento Community Edition e-commerce platform
+nextjs: Next.js React framework
+nuxtjs: Nuxt.js Vue.js framework
+pimcore: Pimcore digital experience platform
+pyramid: Pyramid Python web framework
+rails: Ruby on Rails web application framework
+shopware: Shopware e-commerce platform
+strapi4: Strapi v4 headless CMS
+sylius: Sylius e-commerce platform
+typo3-v11: TYPO3 v11 CMS
+wagtail: Wagtail CMS built on Django
+wordpress-bedrock: WordPress using Bedrock project structure
+wordpress-composer: WordPress with Composer-based management
+wordpress-vanilla: WordPress standard installation

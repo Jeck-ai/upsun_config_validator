@@ -5,9 +5,10 @@ try:
 except ImportError:
     __version__ = "0.0.0.dev0"  # Fallback version if not installed from git
 
-from upsunvalidator.__main__ import validate, validate_string
-from upsunvalidator.templates import (
-    get_available_template_names,
-    get_template_config,
-    get_template_config_with_info,
+# Bring most important methods into main namespace for MCP tools.
+from upsunvalidator.validate.validate import validate, validate_string
+from upsunvalidator.examples import (
+    get_available_example_names,
+    get_example_config,
+    get_example_config_with_info,
 )
