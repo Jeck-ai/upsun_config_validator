@@ -15,7 +15,7 @@ You can contribute in many ways:
 
 ### Report Bugs
 
-Report bugs at [https://github.com/Jeck-ai/upsun_config_validator/issues](https://github.com/Jeck-ai/upsun_config_validator/issues).
+Report bugs at [https://github.com/Jeck-ai/upsunvalidator/issues](https://github.com/Jeck-ai/upsunvalidator/issues).
 
 If you are reporting a bug, please complete the issue template and include:
 
@@ -37,6 +37,30 @@ Anything tagged with "enhancement" and "please-help" is open to whoever wants to
 
 Please do not combine multiple feature enhancements into a single pull request.
 
+### Adding example configuration
+
+This is the most saught after contribution type for this project. 
+This libary will improve in its ability to validate configuration and communicate the specifics of Upsun configuration to MCP tools better as more examples are to it.
+
+Assuming you have first followed the [setting up for local development](#setting-up-the-code-for-local-development) instructions below,
+
+1. Create a configuration file for the example
+
+   ```bash
+   mkdir -p upsunvalidator/examples/<YOUR EXAMPLE NAME>/.upsun
+   touch upsunvalidator/examples/<YOUR EXAMPLE NAME>/.upsun/config.yaml
+   ```
+
+2. Add description for the example to the `examples/meta.yaml` file:
+
+   ```yaml
+   ...
+   laravel: Laravel PHP framework
+   your-example: A Description of the framework that will surface in the MCP server.
+   magentoce: Magento Community Edition e-commerce platform
+   ...
+   ```
+
 ### Write Documentation
 
 Upsun Validator could always use more documentation, whether as part of the official Cookiecutter docs, in docstrings, or even on the web in blog posts, articles, and such.
@@ -52,7 +76,7 @@ This will compile the documentation, open it in your browser and start watching 
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at [https://github.com/Jeck-ai/upsun_config_validator/issues](https://github.com/Jeck-ai/upsun_config_validator/issues).
+The best way to send feedback is to file an issue at [https://github.com/Jeck-ai/upsunvalidator/issues](https://github.com/Jeck-ai/upsunvalidator/issues).
 
 If you are proposing a feature:
 

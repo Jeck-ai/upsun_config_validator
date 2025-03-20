@@ -9,8 +9,16 @@ from jsonschema import validate
 
 from upsunvalidator.schemas.upsun import UPSUN_SCHEMA
 
-from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
-from upsunvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
+from upsunvalidator.utils.utils import (
+    load_yaml_file, 
+    flatten_validation_error
+)
+from upsunvalidator.validate.services import ( 
+    validate_service_version, 
+    validate_service_schema, 
+    validate_service_type, 
+    validate_service_version
+)
 from upsunvalidator.validate.extensions import validate_php_extensions
 
 from upsunvalidator.validate.errors import ValidationError, InvalidServiceVersionError

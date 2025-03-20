@@ -1,9 +1,11 @@
 """Provides access to example Upsun configuration examples."""
 
 import os
+import yaml
 import pathlib
 from typing import Dict, List, Optional, Tuple
 
+from upsunvalidator.utils.utils import load_yaml_file
 
 def _get_valid_examples_dir() -> pathlib.Path:
     """Return the path to the valid examples directory."""
@@ -65,32 +67,12 @@ def get_example_config_with_info() -> Dict[str, Tuple[str, Optional[str]]]:
     example_names = get_available_example_names()
     result = {}
     
-    descriptions = {
-        "wordpress-vanilla": "WordPress standard installation",
-        "wordpress-bedrock": "WordPress using Bedrock project structure",
-        "wordpress-composer": "WordPress with Composer-based management",
-        "drupal11": "Drupal 11 CMS",
-        "laravel": "Laravel PHP framework",
-        "django4": "Django 4 Python web framework",
-        "flask": "Flask Python microframework",
-        "express": "Express.js Node.js web application framework",
-        "nextjs": "Next.js React framework",
-        "nuxtjs": "Nuxt.js Vue.js framework",
-        "rails": "Ruby on Rails web application framework",
-        "gatsby": "Gatsby static site generator",
-        "gatsby-wordpress": "Gatsby with WordPress as a headless CMS",
-        "fastapi": "FastAPI Python web framework",
-        "shopware": "Shopware e-commerce platform",
-        "strapi4": "Strapi v4 headless CMS",
-        "akeneo": "Akeneo PIM (Product Information Management)",
-        "directus": "Directus headless CMS",
-        "magentoce": "Magento Community Edition e-commerce platform",
-        "pimcore": "Pimcore digital experience platform",
-        "pyramid": "Pyramid Python web framework",
-        "sylius": "Sylius e-commerce platform",
-        "typo3-v11": "TYPO3 v11 CMS",
-        "wagtail": "Wagtail CMS built on Django",
-    }
+    # Grab list of examples with decriptions from `meta.yaml` file
+    desc_file = _get_valid_examples_dir() / "meta.yaml"
+    try:
+        descriptions = yaml.safe_load(load_yaml_file(desc_file))
+    except yaml.YAMLError as e:
+        return [f"YAML parsing error: {e}"]
     
     for name in example_names:
         description = descriptions.get(name, f"{name.replace('-', ' ').title()} example")
@@ -112,37 +94,16 @@ def get_example_info() -> Dict[str, Tuple[str, Optional[str]]]:
     """
     example_names = get_available_example_names()
     result = {}
-    
-    descriptions = {
-        "wordpress-vanilla": "WordPress standard installation",
-        "wordpress-bedrock": "WordPress using Bedrock project structure",
-        "wordpress-composer": "WordPress with Composer-based management",
-        "drupal11": "Drupal 11 CMS",
-        "laravel": "Laravel PHP framework",
-        "django4": "Django 4 Python web framework",
-        "flask": "Flask Python microframework",
-        "express": "Express.js Node.js web application framework",
-        "nextjs": "Next.js React framework",
-        "nuxtjs": "Nuxt.js Vue.js framework",
-        "rails": "Ruby on Rails web application framework",
-        "gatsby": "Gatsby static site generator",
-        "gatsby-wordpress": "Gatsby with WordPress as a headless CMS",
-        "fastapi": "FastAPI Python web framework",
-        "shopware": "Shopware e-commerce platform",
-        "strapi4": "Strapi v4 headless CMS",
-        "akeneo": "Akeneo PIM (Product Information Management)",
-        "directus": "Directus headless CMS",
-        "magentoce": "Magento Community Edition e-commerce platform",
-        "pimcore": "Pimcore digital experience platform",
-        "pyramid": "Pyramid Python web framework",
-        "sylius": "Sylius e-commerce platform",
-        "typo3-v11": "TYPO3 v11 CMS",
-        "wagtail": "Wagtail CMS built on Django",
-    }
+
+    # Grab list of examples with decriptions from `meta.yaml` file
+    desc_file = _get_valid_examples_dir() / "meta.yaml"
+    try:
+        descriptions = yaml.safe_load(load_yaml_file(desc_file))
+    except yaml.YAMLError as e:
+        return [f"YAML parsing error: {e}"]
     
     for name in example_names:
         description = descriptions.get(name, f"{name.replace('-', ' ').title()} example")
-        # content = get_example_config(name)
         result[name] = description
     
     return result
