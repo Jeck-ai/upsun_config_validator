@@ -1,13 +1,7 @@
 from jsonschema import ValidationError
 
 class ValidationError(ValidationError):
-    """
-    A schema was invalid under its corresponding metaschema.
-    """
-
-    _word_for_schema_in_error_message = "metaschema"
-    _word_for_instance_in_error_message = "schema"
-    # pass
+    pass
 
 class InvalidServiceVersionError(ValidationError):
     pass

@@ -13,8 +13,7 @@ from upsunvalidator.utils.utils import load_yaml_file, flatten_validation_error
 from upsunvalidator.validate.services import validate_service_version, validate_service_schema, validate_service_type, validate_service_version
 from upsunvalidator.validate.extensions import validate_php_extensions
 
-# from jsonschema import ValidationError
-from upsunvalidator.validate.errors import ValidationError
+from upsunvalidator.validate.errors import ValidationError, InvalidServiceVersionError
 
 def validate_upsun_config_string(config_yaml_content):
     """Validate a string containing Upsun configuration in YAML format.
@@ -301,7 +300,7 @@ def _validate_config(config):
                 # Validate the runtime versions.
                 is_valid, error_message = validate_service_version(app_config['type'], app_name, "runtime")
                 if not is_valid:
-                    raise ValidationError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
+                    raise InvalidServiceVersionError(f"\n\n✘ Error found in application '{app_name}':{error_message}")
                 # Validate PHP extensions if defined.
                 if "php" in app_config["type"]:
                     php_version = app_config["type"].split(":")[1]
